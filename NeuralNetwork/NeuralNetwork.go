@@ -95,22 +95,22 @@ func RandomNetwork(num_inputs, num_hiddens, num_outputs int) *neuralNetwork {
 }
 
 // When two neural networks love each other very much...
-func Mate(mommy *neuralNetwork, daddy *neuralNetwork) *neuralNetwork {
+func Mate(p1 *neuralNetwork, p2 *neuralNetwork) *neuralNetwork {
 	n := new(neuralNetwork)
-	n.num_inputs = mommy.num_inputs
-	n.num_hiddens = mommy.num_hiddens
-	n.num_outputs = mommy.num_outputs
+	n.num_inputs = p1.num_inputs
+	n.num_hiddens = p1.num_hiddens
+	n.num_outputs = p1.num_outputs
 
-	n.activations_hidden = make([]chan float64, mommy.num_hiddens)
-	n.activations_output = make([]chan float64, mommy.num_outputs)
+	n.activations_hidden = make([]chan float64, p1.num_hiddens)
+	n.activations_output = make([]chan float64, p1.num_outputs)
 
-	n.hidden_outputs = make([]float64, mommy.num_hiddens)
+	n.hidden_outputs = make([]float64, p1.num_hiddens)
 
-	n.layer_hidden = make([]*neuron, mommy.num_hiddens)
-	n.layer_output = make([]*neuron, mommy.num_outputs)
+	n.layer_hidden = make([]*neuron, p1.num_hiddens)
+	n.layer_output = make([]*neuron, p1.num_outputs)
 
 	// Initialize hidden activation channels and hidden neurons
-	for i := 0; i < mommy.num_hiddens; i++ {
+	for i := 0; i < p1.num_hiddens; i++ {
 		n.activations_hidden[i] = make(chan float64)
 		n.hidden_outputs[i] = 0.0
 
@@ -118,33 +118,33 @@ func Mate(mommy *neuralNetwork, daddy *neuralNetwork) *neuralNetwork {
 		randomFloat := rand.Float64()
 		// If the random value is less than 0.5, choose the mother
 		if randomFloat < 0.5 {
-			n.layer_hidden[i] = CopyNeuron(mommy.layer_hidden[i])
+			n.layer_hidden[i] = CopyNeuron(p1.layer_hidden[i])
 			// If the random value is greater than 0.5 but less than 0.995, choose
 			// the father.
 		} else if randomFloat < 0.995 {
-			n.layer_hidden[i] = CopyNeuron(daddy.layer_hidden[i])
+			n.layer_hidden[i] = CopyNeuron(p2.layer_hidden[i])
 			// Mutation!
 		} else {
-			n.layer_hidden[i] = RandomNeuron(mommy.num_inputs)
+			n.layer_hidden[i] = RandomNeuron(p1.num_inputs)
 		}
 	}
 
 	// Initialize output activation channels and output neurons
-	for i := 0; i < mommy.num_outputs; i++ {
+	for i := 0; i < p1.num_outputs; i++ {
 		n.activations_output[i] = make(chan float64)
 
 		// Get a random float to determine the parent of this gene
 		randomFloat := rand.Float64()
 		// If the random value is less than 0.5, choose the mother
 		if randomFloat < 0.5 {
-			n.layer_output[i] = CopyNeuron(mommy.layer_output[i])
+			n.layer_output[i] = CopyNeuron(p1.layer_output[i])
 			// If the random value is greater than 0.5 but less than 0.995, choose
 			// the father.
 		} else if randomFloat < 0.995 {
-			n.layer_output[i] = CopyNeuron(daddy.layer_output[i])
+			n.layer_output[i] = CopyNeuron(p2.layer_output[i])
 			// Mutation!
 		} else {
-			n.layer_output[i] = RandomNeuron(mommy.num_hiddens)
+			n.layer_output[i] = RandomNeuron(p1.num_hiddens)
 		}
 	}
 
