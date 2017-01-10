@@ -39,7 +39,7 @@ func RandomNeuron(num_inputs int) *neuron {
 
 // Makes an identical copy of a neuron.
 // Useful for mating.
-func CopyNeuron(n neuron) *neuron {
+func CopyNeuron(n *neuron) *neuron {
 	newNeuron := new(neuron)
 	newNeuron.num_inputs = n.num_inputs
 	newNeuron.weighted_input = 0
