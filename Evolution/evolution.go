@@ -1,6 +1,9 @@
 package evolution
 
 import (
+	"fmt"
+	"math/rand"
+
 	"github.com/CRRDerek/Neuroevolution/games"
 )
 
@@ -32,10 +35,11 @@ func EvolveAgents(g games.Game, playerMaker games.PlayerMaker, generations int,
 	i := 0
 	for {
 		// Start a goroutine to test each member of the population.
-		for j := 0; j < len(pop); j++ {
+		for j := 0; j < len(pop); j++ { // TODO Why is this minus one!?
+			index := j
 			go func() {
-				score := 0
-				player := playerMaker(pop[j])
+				score := 1
+				player := playerMaker(pop[index])
 				// Keep testing this player until the maximum number of games is
 				// reached.
 				for k := 0; k < max_games; k++ {
@@ -43,10 +47,10 @@ func EvolveAgents(g games.Game, playerMaker games.PlayerMaker, generations int,
 					switch games.PlayerTrial(g, player) {
 					// If the agent player wins, reward it
 					case 1:
-						score += 1
+						score += 10
 					// Reward draws too.
 					case 0:
-						score += 1
+						score += 10
 					// If they lose, break out of the loop.
 					case -1:
 						k = max_games
@@ -54,19 +58,28 @@ func EvolveAgents(g games.Game, playerMaker games.PlayerMaker, generations int,
 				}
 
 				// Send the score over the appropriate channel
-				fitness_channels[j] <- score
+				//				fmt.Println("Preparing to send fitness ", index)
+				fitness_channels[index] <- score
+				//				fmt.Println("Sent fitness ", index)
 			}()
 		}
 
 		// Receive fitness values from channels and find the maximum fitness
 		max_fitness = -9999999
-		for j := 0; j < generations; j++ {
+		for j := 0; j < len(pop); j++ { // TODO Why was this -1?
+			//			fmt.Println("Preparing to receive fitness ", j)
 			fitness_values[j] = <-fitness_channels[j]
+			//			fmt.Println("Received fitness ", j)
 			if fitness_values[j] > max_fitness {
 				max_fitness = fitness_values[j]
 				max_agent = pop[j]
 			}
 		}
+
+		// Print generation info
+		fmt.Println("Generation: ", i)
+		fmt.Println("Max fitness: ", max_fitness)
+		fmt.Println(fitness_values)
 
 		// Iterate the generation number and return if the algorithm is complete.
 		i++
@@ -91,6 +104,21 @@ func EvolveAgents(g games.Game, playerMaker games.PlayerMaker, generations int,
 }
 
 func weighted_selection(items []games.Agent, weights []int) games.Agent {
-	// Unimplemented
-	return nil
+	total := 0
+	for i := 0; i < len(weights); i++ {
+		total += weights[i]
+	}
+
+	r := rand.Intn(total)
+	upto := 0
+
+	for i := 0; i < len(items); i++ {
+		w := weights[i]
+		if upto+w >= r {
+			return items[i]
+		}
+		upto += w
+	}
+	fmt.Println("ERROR: Weighted selection failed.")
+	return items[0]
 }

@@ -31,9 +31,12 @@ type neuralNetwork struct {
 // The output array will match the output size of the network.
 func (net neuralNetwork) Predict(inputs []float64) []float64 {
 	// Launch a goroutine for each hidden neuron to calculate the output.
-	for i := 0; i < net.num_hiddens; i++ {
+	for i := 0; i < net.num_hiddens; i++ { // TODO Why is this minus one!?
+		index := i
 		go func() {
-			net.activations_hidden[i] <- net.layer_hidden[i].Activate(inputs)
+			//			fmt.Println("Preparing to send hidden neuron ", index)
+			net.activations_hidden[index] <- net.layer_hidden[index].Activate(inputs)
+			//			fmt.Println("Preparing to send hidden neuron ", index)
 		}()
 	}
 
@@ -44,18 +47,21 @@ func (net neuralNetwork) Predict(inputs []float64) []float64 {
 
 	// Receive values from earlier goroutines.
 	for j := 0; j < net.num_hiddens; j++ {
+		//		fmt.Println("Preparing to receive hidden neuron ", j)
 		net.hidden_outputs[j] = <-net.activations_hidden[j]
+		//		fmt.Println("Received hidden neuron ", j)
 	}
 
 	// Launch a goroutine for each output neuron to calculate the final output.
-	for i := 0; i < net.num_outputs; i++ {
+	for i := 0; i < net.num_outputs; i++ { // TODO Why is this minus one!?
+		index := i
 		go func() {
-			net.activations_output[i] <- net.layer_output[i].Activate(net.hidden_outputs)
+			net.activations_output[index] <- net.layer_output[index].Activate(net.hidden_outputs)
 		}()
 	}
 
 	// Receive values from output goroutines.
-	for j := 0; j < net.num_outputs; j++ {
+	for j := 0; j < net.num_outputs; j++ { // TODO Why is this minus one!?
 		final_outputs[j] = <-net.activations_output[j]
 	}
 
@@ -97,8 +103,8 @@ func RandomNetwork(num_inputs, num_hiddens, num_outputs int) games.Agent {
 }
 
 func (n neuralNetwork) Mate(other games.Agent) games.Agent {
-	o := other.(neuralNetwork)
-	return mate(&n, &o)
+	o := other.(*neuralNetwork)
+	return mate(&n, o)
 }
 
 // When two neural networks love each other very much...
@@ -128,11 +134,8 @@ func mate(p1 *neuralNetwork, p2 *neuralNetwork) *neuralNetwork {
 			n.layer_hidden[i] = CopyNeuron(p1.layer_hidden[i])
 			// If the random value is greater than 0.5 but less than 0.995, choose
 			// the father.
-		} else if randomFloat < 0.995 {
-			n.layer_hidden[i] = CopyNeuron(p2.layer_hidden[i])
-			// Mutation!
 		} else {
-			n.layer_hidden[i] = RandomNeuron(p1.num_inputs)
+			n.layer_hidden[i] = CopyNeuron(p2.layer_hidden[i])
 		}
 	}
 
@@ -147,12 +150,22 @@ func mate(p1 *neuralNetwork, p2 *neuralNetwork) *neuralNetwork {
 			n.layer_output[i] = CopyNeuron(p1.layer_output[i])
 			// If the random value is greater than 0.5 but less than 0.995, choose
 			// the father.
-		} else if randomFloat < 0.995 {
-			n.layer_output[i] = CopyNeuron(p2.layer_output[i])
-			// Mutation!
 		} else {
-			n.layer_output[i] = RandomNeuron(p1.num_hiddens)
+			n.layer_output[i] = CopyNeuron(p2.layer_output[i])
 		}
+	}
+
+	// Check for mutation
+	randomFloat := rand.Float64()
+	if randomFloat > 0.8 {
+		gene := rand.Intn(n.num_hiddens + n.num_outputs)
+		if gene >= n.num_hiddens {
+			gene -= n.num_hiddens
+			n.layer_output[gene] = RandomNeuron(n.num_hiddens)
+		} else {
+			n.layer_hidden[gene] = RandomNeuron(n.num_inputs)
+		}
+
 	}
 
 	return n

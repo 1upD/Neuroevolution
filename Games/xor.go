@@ -40,23 +40,18 @@ func XorGame(p1 Player, p2 Player) int {
 	case 3:
 		a = 1
 		b = 1
-		c = 1
+		c = 0
 	}
 
 	p1move := p1([]float64{a, b}, []interface{}{0, 1})
-	p2move := p2([]float64{a, b}, []interface{}{0, 1})
-
-	if p1move == p2move {
-		return 0
-	}
+	//	p2move := p2([]float64{a, b}, []interface{}{0, 1})
 
 	if p1move == c {
 		return 1
-	}
-
-	if p2move == c {
+	} else {
 		return -1
 	}
+	// Ignore player 2 entirely
 
 	return 0
 }
@@ -64,7 +59,7 @@ func XorGame(p1 Player, p2 Player) int {
 func XorGamePlayerMaker(a Agent) Player {
 	return func(game_state interface{}, moves []interface{}) interface{} {
 		prediction := a.Predict(game_state.([]float64))
-		if prediction[0] > prediction[1] {
+		if prediction[0] > 0.5 {
 			return 1
 		} else {
 			return 0
