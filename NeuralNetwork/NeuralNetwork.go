@@ -3,6 +3,8 @@ package neuralnetwork
 import (
 	"math"
 	"math/rand"
+
+	"github.com/CRRDerek/Neuroevolution/evolution"
 )
 
 // NeuralNetwork provides a Neural Network type.
@@ -23,11 +25,11 @@ type neuralNetwork struct {
 	layer_output []*neuron
 }
 
-// Fire() feeds a given input array into the network and activates the neurons.
+// Predict() feeds a given input array into the network and activates the neurons.
 // It returns the output of the network as an array of floats.
 // The input array must match the input size of the network.
 // The output array will match the output size of the network.
-func (net neuralNetwork) Fire(inputs []float64) []float64 {
+func (net neuralNetwork) Predict(inputs []float64) []float64 {
 	// Launch a goroutine for each hidden neuron to calculate the output.
 	for i := 0; i < net.num_hiddens; i++ {
 		go func() {
@@ -64,7 +66,7 @@ func (net neuralNetwork) Fire(inputs []float64) []float64 {
 // Generate a single hidden layer neural network with randomly assigned weights.
 // This will be used at the beginning of an evolutionary algorithm to randomly
 // seed the population.
-func RandomNetwork(num_inputs, num_hiddens, num_outputs int) *neuralNetwork {
+func RandomAgent(num_inputs, num_hiddens, num_outputs int) evolution.Agent {
 	n := new(neuralNetwork)
 	n.num_inputs = num_inputs
 	n.num_hiddens = num_hiddens
@@ -94,8 +96,13 @@ func RandomNetwork(num_inputs, num_hiddens, num_outputs int) *neuralNetwork {
 	return n
 }
 
+func (n *neuralNetwork) Mate(other evolution.Agent) evolution.Agent {
+	o := other.(neuralNetwork)
+	return mate(n, &o)
+}
+
 // When two neural networks love each other very much...
-func Mate(p1 *neuralNetwork, p2 *neuralNetwork) *neuralNetwork {
+func mate(p1 *neuralNetwork, p2 *neuralNetwork) *neuralNetwork {
 	n := new(neuralNetwork)
 	n.num_inputs = p1.num_inputs
 	n.num_hiddens = p1.num_hiddens
