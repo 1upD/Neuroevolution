@@ -4,7 +4,7 @@ import (
 	"math"
 	"math/rand"
 
-	"github.com/CRRDerek/Neuroevolution/evolution"
+	"github.com/CRRDerek/Neuroevolution/games"
 )
 
 // NeuralNetwork provides a Neural Network type.
@@ -66,7 +66,7 @@ func (net neuralNetwork) Predict(inputs []float64) []float64 {
 // Generate a single hidden layer neural network with randomly assigned weights.
 // This will be used at the beginning of an evolutionary algorithm to randomly
 // seed the population.
-func RandomAgent(num_inputs, num_hiddens, num_outputs int) evolution.Agent {
+func RandomNetwork(num_inputs, num_hiddens, num_outputs int) games.Agent {
 	n := new(neuralNetwork)
 	n.num_inputs = num_inputs
 	n.num_hiddens = num_hiddens
@@ -96,9 +96,9 @@ func RandomAgent(num_inputs, num_hiddens, num_outputs int) evolution.Agent {
 	return n
 }
 
-func (n *neuralNetwork) Mate(other evolution.Agent) evolution.Agent {
+func (n neuralNetwork) Mate(other games.Agent) games.Agent {
 	o := other.(neuralNetwork)
-	return mate(n, &o)
+	return mate(&n, &o)
 }
 
 // When two neural networks love each other very much...

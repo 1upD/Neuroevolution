@@ -1,7 +1,7 @@
 package evolution
 
 import (
-	"github.com/CRRDerek/Neuroevolution/Games"
+	"github.com/CRRDerek/Neuroevolution/games"
 )
 
 // Given a game, a player factory function, (specific to that game) the number of
