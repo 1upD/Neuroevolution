@@ -1,4 +1,4 @@
-package evolution
+package games
 
 type Agent interface {
 	Predict(inputs []float64) []float64
