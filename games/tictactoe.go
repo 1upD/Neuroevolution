@@ -1,12 +1,20 @@
 package games
 
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"strconv"
+	"strings"
+)
+
 //   1 | 2 | 3
 //   4 | 5 | 6
 //   7 | 8 | 9
 //
 // A game state is stored as an array of 9 integers. 0 means no one has placed,
 // -1 means X has placed, 1 means O has placed.
-func TicTacToe(o_player Player, x_player Player) int {
+func TicTacToe(x_player Player, o_player Player) int {
 	game_state := [9]int{0, 0, 0, 0, 0, 0, 0, 0, 0}
 	score := [8][2]int{{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}}
 	var moves []interface{}
@@ -21,7 +29,7 @@ func TicTacToe(o_player Player, x_player Player) int {
 			return 0
 		}
 
-		player_move = x_player(game_state, moves).(int)
+		player_move = x_player(invert_game_state(game_state), moves).(int)
 		// For now let's assume all players always return valid moves.
 		// TODO Check that this move is a valid move
 
@@ -40,7 +48,7 @@ func TicTacToe(o_player Player, x_player Player) int {
 			return 0
 		}
 
-		player_move = o_player(invert_game_state(game_state), moves).(int)
+		player_move = o_player(game_state, moves).(int)
 		// For now let's assume all players always return valid moves.
 		// TODO Check that this move is a valid move
 
@@ -129,10 +137,10 @@ func score_move(score [8][2]int, player_move int, player_index int) [8][2]int {
 func checkScore(score [8][2]int) int {
 	for i := 0; i < 8; i++ {
 		if score[i][0] == 3 && score[i][1] == 0 {
-			return -1
+			return 1
 		}
 		if score[i][0] == 0 && score[i][1] == 3 {
-			return 1
+			return -1
 		}
 	}
 
@@ -182,5 +190,34 @@ func TicTacToePlayerMaker(a Agent) Player {
 
 		return max_choice
 
+	}
+}
+
+func HumanTicTacToePlayer(game_state interface{}, moves []interface{}) interface{} {
+	state := game_state.([9]int)
+	fmt.Printf("\n%v | %v | %v", state[0], state[1], state[2])
+	fmt.Printf("\n%v | %v | %v", state[3], state[4], state[5])
+	fmt.Printf("\n%v | %v | %v", state[6], state[7], state[8])
+	fmt.Println("\nWhat is your move? ")
+	fmt.Printf("\nPossible moves: %v", moves)
+
+	reader := bufio.NewReader(os.Stdin)
+	for {
+		fmt.Println("\nEnter an integer 0-8: ")
+		text, _ := reader.ReadString('\n')
+		i, err := strconv.Atoi(strings.Trim(text, "\n\r"))
+
+		if err != nil {
+			fmt.Printf("\nError: %v", err)
+		}
+
+		fmt.Printf("\nYou entered: %v -> %v", text, i)
+		for j := 0; j < len(moves); j++ {
+			if moves[j] == i {
+				return moves[j]
+			}
+		}
+
+		fmt.Println("\nInvalid move. Please try again.")
 	}
 }

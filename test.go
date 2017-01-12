@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/CRRDerek/Neuroevolution/evolution"
 	"github.com/CRRDerek/Neuroevolution/games"
 	"github.com/CRRDerek/Neuroevolution/neuralnetwork"
@@ -30,7 +32,20 @@ func testTicTacToe() {
 		pop[i] = neuralnetwork.RandomNetwork(28, 56, 9)
 	}
 
-	evolution.EvolveAgents(games.TicTacToe, games.TicTacToePlayerMaker,
-		20000, 256, pop)
+	evolved_agent := evolution.EvolveAgents(games.TicTacToe, games.TicTacToePlayerMaker,
+		10000, 1024, pop)
+
+	fmt.Println("Training complete!")
+
+	for {
+		victor := games.TicTacToe(games.TicTacToePlayerMaker(evolved_agent), games.HumanTicTacToePlayer)
+		if victor == -1 {
+			fmt.Println("\n\nYou win!")
+		} else if victor == 0 {
+			fmt.Println("\n\nDraw!")
+		} else if victor == 1 {
+			fmt.Println("\n\nYou lose!")
+		}
+	}
 
 }

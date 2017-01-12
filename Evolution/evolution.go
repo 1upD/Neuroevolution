@@ -30,6 +30,8 @@ func EvolveAgents(g games.Game, playerMaker games.PlayerMaker, generations int,
 		fitness_channels[i] = make(chan int)
 	}
 
+	streak := 0
+
 	// Loop the algorithm for as many iterations are specified in the number of
 	// generations.
 	i := 0
@@ -76,6 +78,12 @@ func EvolveAgents(g games.Game, playerMaker games.PlayerMaker, generations int,
 			}
 		}
 
+		if max_fitness == max_games {
+			streak += 1
+		} else {
+			streak = 0
+		}
+
 		// Print generation info
 		fmt.Println("Generation: ", i)
 		fmt.Println("Max fitness: ", max_fitness)
@@ -83,7 +91,7 @@ func EvolveAgents(g games.Game, playerMaker games.PlayerMaker, generations int,
 
 		// Iterate the generation number and return if the algorithm is complete.
 		i++
-		if i >= generations {
+		if i >= generations || streak >= 10 {
 			return max_agent
 		}
 
