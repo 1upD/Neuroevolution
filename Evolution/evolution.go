@@ -38,7 +38,7 @@ func EvolveAgents(g games.Game, playerMaker games.PlayerMaker, generations int,
 		for j := 0; j < len(pop); j++ { // TODO Why is this minus one!?
 			index := j
 			go func() {
-				score := 1
+				score := 0
 				player := playerMaker(pop[index])
 				// Keep testing this player until the maximum number of games is
 				// reached.
@@ -47,10 +47,10 @@ func EvolveAgents(g games.Game, playerMaker games.PlayerMaker, generations int,
 					switch games.PlayerTrial(g, player) {
 					// If the agent player wins, reward it
 					case 1:
-						score += 10
+						score += 1
 					// Reward draws too.
 					case 0:
-						score += 10
+						score += 1
 					// If they lose, break out of the loop.
 					case -1:
 						k = max_games
@@ -115,6 +115,7 @@ func weighted_selection(items []games.Agent, weights []int) games.Agent {
 	for i := 0; i < len(items); i++ {
 		w := weights[i]
 		if upto+w >= r {
+			//			fmt.Println("Selected item ", i, " with weight ", weights[i])
 			return items[i]
 		}
 		upto += w

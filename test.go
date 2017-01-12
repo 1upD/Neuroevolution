@@ -7,6 +7,23 @@ import (
 )
 
 func main() {
+	//testXOR()
+	testTicTacToe()
+}
+
+func testXOR() {
+	// Seed the initial population
+	pop := make([]games.Agent, 100)
+	for i := 0; i < 100; i++ {
+		pop[i] = neuralnetwork.RandomNetwork(3, 4, 1)
+	}
+
+	evolution.EvolveAgents(games.XorGame, games.XorGamePlayerMaker,
+		2000, 256, pop)
+
+}
+
+func testTicTacToe() {
 	// Seed the initial population
 	pop := make([]games.Agent, 100)
 	for i := 0; i < 100; i++ {
@@ -14,6 +31,6 @@ func main() {
 	}
 
 	evolution.EvolveAgents(games.TicTacToe, games.TicTacToePlayerMaker,
-		10000, 256, pop)
+		20000, 256, pop)
 
 }

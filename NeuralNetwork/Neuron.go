@@ -44,7 +44,8 @@ func CopyNeuron(n *neuron) *neuron {
 	newNeuron.num_inputs = n.num_inputs
 	newNeuron.weighted_input = 0
 	newNeuron.weights = make([]float64, newNeuron.num_inputs)
-	copy(n.weights, newNeuron.weights)
+	//copy(n.weights, newNeuron.weights)
+	copy(newNeuron.weights, n.weights)
 	return newNeuron
 }
 

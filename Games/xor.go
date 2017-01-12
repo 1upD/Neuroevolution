@@ -58,7 +58,12 @@ func XorGame(p1 Player, p2 Player) int {
 
 func XorGamePlayerMaker(a Agent) Player {
 	return func(game_state interface{}, moves []interface{}) interface{} {
-		prediction := a.Predict(game_state.([]float64))
+		inputs := []float64{1.0}
+
+		inputs = append(inputs, game_state.([]float64)[0])
+		inputs = append(inputs, game_state.([]float64)[1])
+
+		prediction := a.Predict(inputs)
 		if prediction[0] > 0.5 {
 			return 1
 		} else {

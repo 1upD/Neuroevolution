@@ -148,28 +148,28 @@ func TicTacToePlayerMaker(a Agent) Player {
 		for i := 0; i < 9; i++ {
 			val := game_state.([9]int)[i]
 			if val == -1 {
-				inputs = append(inputs, 1)
+				inputs = append(inputs, 1.0)
 			} else {
-				inputs = append(inputs, 0)
+				inputs = append(inputs, 0.0)
 			}
 
 			if val == 0 {
-				inputs = append(inputs, 1)
+				inputs = append(inputs, 1.0)
 			} else {
-				inputs = append(inputs, 0)
+				inputs = append(inputs, 0.0)
 			}
 
 			if val == 1 {
-				inputs = append(inputs, 1)
+				inputs = append(inputs, 1.0)
 			} else {
-				inputs = append(inputs, 0)
+				inputs = append(inputs, 0.0)
 			}
 
 		}
 
 		predictions := a.Predict(inputs)
 
-		max_choice := 0
+		max_choice := -1
 		max_val := -999.0
 		for i := 0; i < len(moves); i++ {
 			move := moves[i].(int)
