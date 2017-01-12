@@ -6,7 +6,7 @@ package games
 //
 // A game state is stored as an array of 9 integers. 0 means no one has placed,
 // -1 means X has placed, 1 means O has placed.
-func tic_tac_toe(o_player Player, x_player Player) int {
+func TicTacToe(o_player Player, x_player Player) int {
 	game_state := [9]int{0, 0, 0, 0, 0, 0, 0, 0, 0}
 	score := [8][2]int{{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}}
 	var moves []interface{}
@@ -52,31 +52,135 @@ func tic_tac_toe(o_player Player, x_player Player) int {
 		}
 	}
 
+	// What happened? Return a draw.
 	return 0
 }
 
 // Given a game state for tic tac toe, return a list of valid moves
 func calculate_moves(game_state [9]int) []interface{} {
-	// TODO unimplemented
-	return []interface{}{0}
+	var moves []interface{}
+
+	for i := 0; i < 9; i++ {
+		if game_state[i] == 0 {
+			moves = append(moves, i)
+		}
+	}
+
+	return moves
 }
 
+// Given a game state, inverts the player names of each space so that either player
+// can see the state as theirs
 func invert_game_state(game_state [9]int) [9]int {
-	// TODO unimplemented
-	return [9]int{0, 0, 0, 0, 0, 0, 0, 0, 0}
+	inverse_game_state := [9]int{0, 0, 0, 0, 0, 0, 0, 0, 0}
+	for i := 0; i < 9; i++ {
+		inverse_game_state[i] = -game_state[i]
+	}
+	return inverse_game_state
 }
 
+// Given a game state, player move, and player number,
+// plays the chosen move on the state and returns the
+// new state.
 func move(game_state [9]int, player_move int, player_number int) [9]int {
-	// TODO unimplemented
-	return [9]int{0, 0, 0, 0, 0, 0, 0, 0, 0}
+	game_state[player_move] = player_number
+	return game_state
 }
 
 func score_move(score [8][2]int, player_move int, player_index int) [8][2]int {
-	// TODO unimplemented
-	return [8][2]int{{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}}
+	switch player_move {
+	case 0:
+		score[0][player_index] += 1
+		score[3][player_index] += 1
+		score[7][player_index] += 1
+	case 1:
+		score[0][player_index] += 1
+		score[4][player_index] += 1
+	case 2:
+		score[0][player_index] += 1
+		score[5][player_index] += 1
+		score[6][player_index] += 1
+	case 3:
+		score[1][player_index] += 1
+		score[3][player_index] += 1
+	case 4:
+		score[1][player_index] += 1
+		score[4][player_index] += 1
+		score[6][player_index] += 1
+		score[7][player_index] += 1
+	case 5:
+		score[1][player_index] += 1
+		score[5][player_index] += 1
+	case 6:
+		score[2][player_index] += 1
+		score[3][player_index] += 1
+		score[6][player_index] += 1
+	case 7:
+		score[2][player_index] += 1
+		score[4][player_index] += 1
+	case 8:
+		score[2][player_index] += 1
+		score[5][player_index] += 1
+		score[7][player_index] += 1
+	}
+	return score
 }
 
 func checkScore(score [8][2]int) int {
-	// TODO unimplemented
+	for i := 0; i < 8; i++ {
+		if score[i][0] == 3 && score[i][1] == 0 {
+			return -1
+		}
+		if score[i][0] == 0 && score[i][1] == 3 {
+			return 1
+		}
+	}
+
 	return 0
+
+}
+
+func TicTacToePlayerMaker(a Agent) Player {
+	return func(game_state interface{}, moves []interface{}) interface{} {
+
+		inputs := []float64{1.0}
+
+		for i := 0; i < 9; i++ {
+			val := game_state.([9]int)[i]
+			if val == -1 {
+				inputs = append(inputs, 1)
+			} else {
+				inputs = append(inputs, 0)
+			}
+
+			if val == 0 {
+				inputs = append(inputs, 1)
+			} else {
+				inputs = append(inputs, 0)
+			}
+
+			if val == 1 {
+				inputs = append(inputs, 1)
+			} else {
+				inputs = append(inputs, 0)
+			}
+
+		}
+
+		predictions := a.Predict(inputs)
+
+		max_choice := 0
+		max_val := -999.0
+		for i := 0; i < len(moves); i++ {
+			move := moves[i].(int)
+			val := predictions[move]
+			if val > max_val {
+				max_val = val
+				max_choice = move
+			}
+		}
+
+		return max_choice
+
+	}
 }

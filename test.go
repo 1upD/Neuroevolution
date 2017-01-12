@@ -10,10 +10,10 @@ func main() {
 	// Seed the initial population
 	pop := make([]games.Agent, 100)
 	for i := 0; i < 100; i++ {
-		pop[i] = neuralnetwork.RandomNetwork(2, 8, 1)
+		pop[i] = neuralnetwork.RandomNetwork(28, 56, 9)
 	}
 
-	evolution.EvolveAgents(games.XorGame, games.XorGamePlayerMaker,
-		1000, 256, pop)
+	evolution.EvolveAgents(games.TicTacToe, games.TicTacToePlayerMaker,
+		10000, 256, pop)
 
 }
