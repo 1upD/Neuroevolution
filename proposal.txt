@@ -1,0 +1,8 @@
+Neuroevolution in Go
+Project Proposal
+
+My project for CS-344 will be to implement a neuroevolution algorithm in golang. I intend to compare neuroevolution solutions to common game playing problems with more traditional search based algorithms and to compare the results of neuroevolution for multiple different games.
+
+So far, I have working Go code that can solve a simple implementation of tic-tac-toe in a reasonable amount of time. I intend to implement either Connect-Four or Othello, and if time allows, attempt to have the algorithm play Go. (That is Go the game, not Go the language)
+
+Neuroevolution is an appropriate algorithm for the course because it combines techniques from supervised learning (neural networks) with search algorithms. (genetic algorithms)
