@@ -46,12 +46,46 @@ func Checkers(black_player Player, red_player Player) int {
 	red_score := 0
 	black_score := 0
 
-	// Moves should store coordinate pairs as integers
+	// Moves should store arrays of four integers where the first two represent
+	// a coordinate pair of the piece to be moved and the second two represent the
+	// space to move to.
 	var moves []interface{}
-	var player_move int
-	var victor int
+	var move_score int
+	var player_move [4]int
 
-	return 0
+	// Main game loop
+	for red_score < 12 && black_score < 12 {
+		// Black player move
+		moves = calculate_checkers_moves(game_state)
+		for len(moves) > 0 {
+			player_move = black_player(game_state, moves).([4]int)
+			game_state, move_score = checkers_make_move(game_state, player_move)
+			moves = calculate_checkers_captures_per_piece(game_state, [2]int{player_move[2], player_move[3]})
+			black_score += move_score
+		}
+
+		// Flip the board in preparation for red player
+		game_state = checkers_board_flip(game_state)
+		moves = calculate_checkers_moves(game_state)
+
+		// Red player move
+		for len(moves) > 0 {
+			player_move = red_player(game_state, moves).([4]int)
+			game_state, move_score = checkers_make_move(game_state, player_move)
+			moves = calculate_checkers_moves_per_piece(game_state, [2]int{player_move[2], player_move[3]})
+			red_score += move_score
+		}
+
+		// Flip board back
+		game_state = checkers_board_flip(game_state)
+
+	}
+
+	if black_score > red_score {
+		return 1
+	} else {
+		return -1
+	}
 }
 
 // Calculates all possible normal moves for the black player on a checkers board
@@ -95,4 +129,11 @@ func checkers_board_flip(game_state [4][8]int) [4][8]int {
 func flip_move(move [4]int) [4]int {
 	// TODO unimplemented
 	return move
+}
+
+// Given a board state and a valid move, make the move
+// Returns a board state and the number of captures
+func checkers_make_move(game_state [4][8]int, move [4]int) ([4][8]int, int) {
+	// TODO unimplemented
+	return game_state, 0
 }
