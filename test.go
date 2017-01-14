@@ -27,8 +27,9 @@ func testXOR() {
 
 func testTicTacToe() {
 	// Seed the initial population
-	pop := make([]games.Agent, 100)
-	for i := 0; i < 100; i++ {
+	pop_size := 256
+	pop := make([]games.Agent, pop_size)
+	for i := 0; i < pop_size; i++ {
 		pop[i] = neuralnetwork.RandomNetwork(28, 56, 9)
 	}
 
