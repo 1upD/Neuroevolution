@@ -115,8 +115,33 @@ func calculate_checkers_moves(game_state [4][8]int) []interface{} {
 
 // Calculate capture moves for a given black checker on a checkers board
 func calculate_checkers_moves_per_piece(game_state [4][8]int, checker [2]int) []interface{} {
-	// TODO unimplemented
-	return nil
+	moves := []interface{}{}
+	x := checker[0]
+	y := checker[1]
+
+	if game_state[x][y-1] == 0 {
+		moves = append(moves, [4]int{x, y, x, y - 1})
+	}
+
+	if checker[1]%2 == 0 {
+		// Even rows
+		if x < 3 {
+			if game_state[x+1][y-1] == 0 {
+				moves = append(moves, [4]int{x, y, x + 1, y - 1})
+			}
+		}
+
+	} else {
+		// Odd rows
+		if x > 0 {
+			if game_state[x-1][y-1] == 0 {
+				moves = append(moves, [4]int{x, y, x - 1, y - 1})
+			}
+		}
+
+	}
+
+	return moves
 }
 
 // Calculate capture moves for a given black checker on a checkers board
@@ -149,23 +174,23 @@ func checkers_make_move(game_state [4][8]int, move [4]int) ([4][8]int, int) {
 // This function prints a game state to the console and prompts the user to select a move.
 func HumanCheckersPlayer(game_state interface{}, moves []interface{}) interface{} {
 	state := game_state.([4][8]int)
-	fmt.Printf("\n0:\t\t%v\t%v\t%v\t%v", state[0][0], state[1][0], state[2][0], state[3][0])
-	fmt.Printf("\n1:\t%v\t%v\t%v\t%v\t", state[0][1], state[1][1], state[2][1], state[3][1])
-	fmt.Printf("\n2:\t\t%v\t%v\t%v\t%v", state[0][2], state[1][2], state[2][2], state[3][2])
-	fmt.Printf("\n3:\t%v\t%v\t%v\t%v\t", state[0][3], state[1][3], state[2][3], state[3][3])
-	fmt.Printf("\n4:\t\t%v\t%v\t%v\t%v", state[0][4], state[1][4], state[2][4], state[3][4])
-	fmt.Printf("\n5:\t%v\t%v\t%v\t%v\t", state[0][5], state[1][5], state[2][5], state[3][5])
-	fmt.Printf("\n6:\t\t%v\t%v\t%v\t%v", state[0][6], state[1][6], state[2][6], state[3][6])
-	fmt.Printf("\n7:\t%v\t%v\t%v\t%v\t", state[0][7], state[1][7], state[2][7], state[3][7])
-	fmt.Println("\n-:\t0\t1\t2\t3\t4\t")
+	fmt.Printf("\n0:\tX\t%v\tX\t%v\tX\t%v\tX\t%v", state[0][0], state[1][0], state[2][0], state[3][0])
+	fmt.Printf("\n1:\t%v\tX\t%v\tX\t%v\tX\t%v\tX", state[0][1], state[1][1], state[2][1], state[3][1])
+	fmt.Printf("\n2:\tX\t%v\tX\t%v\tX\t%v\tX\t%v", state[0][2], state[1][2], state[2][2], state[3][2])
+	fmt.Printf("\n3:\t%v\tX\t%v\tX\t%v\tX\t%v\tX", state[0][3], state[1][3], state[2][3], state[3][3])
+	fmt.Printf("\n4:\tX\t%v\tX\t%v\tX\t%v\tX\t%v", state[0][4], state[1][4], state[2][4], state[3][4])
+	fmt.Printf("\n5:\t%v\tX\t%v\tX\t%v\tX\t%v\tX", state[0][5], state[1][5], state[2][5], state[3][5])
+	fmt.Printf("\n6:\tX\t%v\tX\t%v\tX\t%v\tX\t%v", state[0][6], state[1][6], state[2][6], state[3][6])
+	fmt.Printf("\n7:\t%v\tX\t%v\tX\t%v\tX\t%v\tX", state[0][7], state[1][7], state[2][7], state[3][7])
+	fmt.Println("\n\n-:\t0\t0\t1\t1\t2\t2\t3\t3\t")
 
 	fmt.Println("\nWhat is your move? ")
 	fmt.Printf("\nPossible moves: %v", moves)
 
 	reader := bufio.NewReader(os.Stdin)
 	for {
-		fmt.Println("Choose an X coordinate: ")
-		fmt.Println("\nEnter an integer 0-8: ")
+		fmt.Println("\nChoose an X coordinate: ")
+		fmt.Println("\nEnter an integer 0-3: ")
 		text, _ := reader.ReadString('\n')
 		x1, err := strconv.Atoi(strings.Trim(text, "\n\r"))
 
@@ -173,8 +198,8 @@ func HumanCheckersPlayer(game_state interface{}, moves []interface{}) interface{
 			fmt.Printf("\nError: %v", err)
 		}
 
-		fmt.Println("Choose an Y coordinate: ")
-		fmt.Println("\nEnter an integer 0-8: ")
+		fmt.Println("\nChoose a Y coordinate: ")
+		fmt.Println("\nEnter an integer 0-7: ")
 		text, _ = reader.ReadString('\n')
 		y1, err := strconv.Atoi(strings.Trim(text, "\n\r"))
 
@@ -182,8 +207,8 @@ func HumanCheckersPlayer(game_state interface{}, moves []interface{}) interface{
 			fmt.Printf("\nError: %v", err)
 		}
 
-		fmt.Println("Choose an X coordinate: ")
-		fmt.Println("\nEnter an integer 0-8: ")
+		fmt.Println("\nChoose an X coordinate: ")
+		fmt.Println("\nEnter an integer 0-3: ")
 		text, _ = reader.ReadString('\n')
 		x2, err := strconv.Atoi(strings.Trim(text, "\n\r"))
 
@@ -191,8 +216,8 @@ func HumanCheckersPlayer(game_state interface{}, moves []interface{}) interface{
 			fmt.Printf("\nError: %v", err)
 		}
 
-		fmt.Println("Choose an Y coordinate: ")
-		fmt.Println("\nEnter an integer 0-8: ")
+		fmt.Println("\nChoose a Y coordinate: ")
+		fmt.Println("\nEnter an integer 0-7: ")
 		text, _ = reader.ReadString('\n')
 		y2, err := strconv.Atoi(strings.Trim(text, "\n\r"))
 
