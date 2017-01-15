@@ -68,7 +68,7 @@ func Checkers(black_player Player, red_player Player) int {
 		for len(moves) > 0 {
 			player_move = black_player(game_state, moves).([4]int)
 			game_state, move_score = checkers_make_move(game_state, player_move)
-			moves = calculate_checkers_captures_per_piece(game_state, [2]int{player_move[2], player_move[3]})
+			moves = calculate_checkers_captures_per_piece(game_state, [2]int{player_move[2], player_move[3]}, game_state[player_move[2]][player_move[3]] == 2)
 			black_score += move_score
 		}
 
@@ -80,7 +80,7 @@ func Checkers(black_player Player, red_player Player) int {
 		for len(moves) > 0 {
 			player_move = red_player(game_state, moves).([4]int)
 			game_state, move_score = checkers_make_move(game_state, player_move)
-			moves = calculate_checkers_moves_per_piece(game_state, [2]int{player_move[2], player_move[3]})
+			moves = calculate_checkers_captures_per_piece(game_state, [2]int{player_move[2], player_move[3]}, game_state[player_move[2]][player_move[3]] == 2)
 			red_score += move_score
 		}
 
@@ -103,9 +103,9 @@ func calculate_checkers_moves(game_state [4][8]int) []interface{} {
 
 	for i := 0; i < 4; i++ {
 		for j := 0; j < 8; j++ {
-			if game_state[i][j] == 1 {
-				moves = append(moves, calculate_checkers_moves_per_piece(game_state, [2]int{i, j})...)
-				moves = append(moves, calculate_checkers_captures_per_piece(game_state, [2]int{i, j})...)
+			if game_state[i][j] > 0 {
+				moves = append(moves, calculate_checkers_moves_per_piece(game_state, [2]int{i, j}, game_state[i][j] == 2)...)
+				moves = append(moves, calculate_checkers_captures_per_piece(game_state, [2]int{i, j}, game_state[i][j] == 2)...)
 			}
 		}
 	}
@@ -114,40 +114,57 @@ func calculate_checkers_moves(game_state [4][8]int) []interface{} {
 }
 
 // Calculate capture moves for a given black checker on a checkers board
-func calculate_checkers_moves_per_piece(game_state [4][8]int, checker [2]int) []interface{} {
+func calculate_checkers_moves_per_piece(game_state [4][8]int, checker [2]int, isKing bool) []interface{} {
 	moves := []interface{}{}
 	x := checker[0]
 	y := checker[1]
 
-	if game_state[x][y-1] == 0 {
+	if y > 0 && game_state[x][y-1] == 0 {
 		moves = append(moves, [4]int{x, y, x, y - 1})
+	}
+
+	if isKing && y < 7 && game_state[x][y+1] == 0 {
+		moves = append(moves, [4]int{x, y, x, y + 1})
 	}
 
 	if checker[1]%2 == 0 {
 		// Even rows
-		if x < 3 {
+		if y > 0 && x < 3 {
 			if game_state[x+1][y-1] == 0 {
 				moves = append(moves, [4]int{x, y, x + 1, y - 1})
+			}
+		}
+		// Kings can move backwards
+		if isKing && y < 7 && x > 0 {
+			if game_state[x-1][y+1] == 0 {
+				moves = append(moves, [4]int{x, y, x - 1, y + 1})
 			}
 		}
 
 	} else {
 		// Odd rows
-		if x > 0 {
+		if y > 0 && x > 0 {
 			if game_state[x-1][y-1] == 0 {
 				moves = append(moves, [4]int{x, y, x - 1, y - 1})
 			}
 		}
-
+		// Kings can move backwards
+		if isKing && y < 7 && x < 3 {
+			if game_state[x+1][y+1] == 0 {
+				moves = append(moves, [4]int{x, y, x + 1, y + 1})
+			}
+		}
 	}
 
 	return moves
 }
 
 // Calculate capture moves for a given black checker on a checkers board
-func calculate_checkers_captures_per_piece(game_state [4][8]int, checker [2]int) []interface{} {
-	// TODO unimplemented
-	return nil
+func calculate_checkers_captures_per_piece(game_state [4][8]int, checker [2]int, isKing bool) []interface{} {
+	moves := []interface{}{}
+	//	x := checker[0]
+	//	y := checker[1]
+	return moves
 }
 
 // Given a checkers board configuration, flip the board so that red player is now
@@ -167,8 +184,18 @@ func flip_move(move [4]int) [4]int {
 // Given a board state and a valid move, make the move
 // Returns a board state and the number of captures
 func checkers_make_move(game_state [4][8]int, move [4]int) ([4][8]int, int) {
-	// TODO unimplemented
-	return game_state, 0
+	// Pick up a piece
+	game_state[move[0]][move[1]] = 0
+
+	// TODO Complete this section
+	// Check if this move is a capture and remove opposing pieces
+	captured := 0
+
+	// Place the piece
+	game_state[move[2]][move[3]] = 1
+
+	// Return the game state
+	return game_state, captured
 }
 
 // This function prints a game state to the console and prompts the user to select a move.
