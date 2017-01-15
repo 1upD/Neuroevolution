@@ -171,8 +171,17 @@ func calculate_checkers_captures_per_piece(game_state [4][8]int, checker [2]int,
 // black player and vice versa. This way all players will see themselves as black
 // player.
 func checkers_board_flip(game_state [4][8]int) [4][8]int {
-	// TODO unimplemented
-	return game_state
+	flip_state := [4][8]int{[8]int{-1, -1, -1, 0, 0, 1, 1, 1},
+		[8]int{-1, -1, -1, 0, 0, 1, 1, 1},
+		[8]int{-1, -1, -1, 0, 0, 1, 1, 1},
+		[8]int{-1, -1, -1, 0, 0, 1, 1, 1}}
+	for i := 0; i < 4; i++ {
+		for j := 0; j < 8; j++ {
+			flip_state[i][j] = -1 * game_state[3-i][7-j]
+		}
+	}
+
+	return flip_state
 }
 
 // Given a black player move, flip the board so that it is played as red player
