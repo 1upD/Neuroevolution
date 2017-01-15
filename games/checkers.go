@@ -193,15 +193,33 @@ func flip_move(move [4]int) [4]int {
 // Given a board state and a valid move, make the move
 // Returns a board state and the number of captures
 func checkers_make_move(game_state [4][8]int, move [4]int) ([4][8]int, int) {
+	isKing := false
+
 	// Pick up a piece
+	// Is it already a king?
+	if game_state[move[0]][move[1]] == 2 {
+		isKing = true
+	}
+
 	game_state[move[0]][move[1]] = 0
 
 	// TODO Complete this section
 	// Check if this move is a capture and remove opposing pieces
 	captured := 0
 
+	// Should the piece be kinged?
+	if move[3] == 0 {
+		isKing = true
+	}
+
 	// Place the piece
-	game_state[move[2]][move[3]] = 1
+	if isKing {
+		game_state[move[2]][move[3]] = 2
+
+	} else {
+		game_state[move[2]][move[3]] = 1
+
+	}
 
 	// Return the game state
 	return game_state, captured
