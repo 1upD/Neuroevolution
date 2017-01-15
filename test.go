@@ -10,7 +10,8 @@ import (
 
 func main() {
 	//testXOR()
-	testTicTacToe()
+	//testTicTacToe()
+	testCheckers()
 }
 
 func testXOR() {
@@ -49,4 +50,17 @@ func testTicTacToe() {
 		}
 	}
 
+}
+
+func testCheckers() {
+	for {
+		victor := games.Checkers(games.HumanCheckersPlayer, games.HumanCheckersPlayer)
+		if victor == -1 {
+			fmt.Println("\n\nYou win!")
+		} else if victor == 0 {
+			fmt.Println("\n\nDraw!")
+		} else if victor == 1 {
+			fmt.Println("\n\nYou lose!")
+		}
+	}
 }
