@@ -162,8 +162,65 @@ func calculate_checkers_moves_per_piece(game_state [4][8]int, checker [2]int, is
 // Calculate capture moves for a given black checker on a checkers board
 func calculate_checkers_captures_per_piece(game_state [4][8]int, checker [2]int, isKing bool) []interface{} {
 	moves := []interface{}{}
-	//	x := checker[0]
-	//	y := checker[1]
+	x := checker[0]
+	y := checker[1]
+
+	// Is the space diagonal to the given pice (in the same space pair) occupied
+	// by an opponent piece?
+	// This is a little bit confusing.
+	if y > 1 && game_state[x][y-1] == -1 {
+		// Is the piece to be jumped in an even or odd row?
+		if x > 0 && (y-1)%2 == 0 {
+			//
+			moves = append(moves, [4]int{x, y, x - 1, y - 2})
+
+		} else if x < 3 {
+			moves = append(moves, [4]int{x, y, x + 1, y - 2})
+		}
+
+	}
+	// If this is a king, check backwards
+	if isKing && y < 7 && game_state[x][y+1] == -1 {
+		// Is the piece to be jumped in an even or odd row?
+		if (y-1)%2 == 0 {
+			//
+			moves = append(moves, [4]int{x, y, x + 1, y + 2})
+
+		} else {
+			moves = append(moves, [4]int{x, y, x - 1, y + 2})
+		}
+
+	}
+
+	//	if checker[1]%2 == 0 {
+	//		// Even rows
+	//		if y > 0 && x < 3 {
+	//			if game_state[x+1][y-1] == 0 {
+	//				moves = append(moves, [4]int{x, y, x + 1, y - 1})
+	//			}
+	//		}
+	//		// Kings can move backwards
+	//		if isKing && y < 7 && x > 0 {
+	//			if game_state[x-1][y+1] == 0 {
+	//				moves = append(moves, [4]int{x, y, x - 1, y + 1})
+	//			}
+	//		}
+
+	//	} else {
+	//		// Odd rows
+	//		if y > 0 && x > 0 {
+	//			if game_state[x-1][y-1] == 0 {
+	//				moves = append(moves, [4]int{x, y, x - 1, y - 1})
+	//			}
+	//		}
+	//		// Kings can move backwards
+	//		if isKing && y < 7 && x < 3 {
+	//			if game_state[x+1][y+1] == 0 {
+	//				moves = append(moves, [4]int{x, y, x + 1, y + 1})
+	//			}
+	//		}
+	//	}
+
 	return moves
 }
 
@@ -184,16 +241,11 @@ func checkers_board_flip(game_state [4][8]int) [4][8]int {
 	return flip_state
 }
 
-// Given a black player move, flip the board so that it is played as red player
-func flip_move(move [4]int) [4]int {
-	// TODO unimplemented
-	return move
-}
-
 // Given a board state and a valid move, make the move
 // Returns a board state and the number of captures
 func checkers_make_move(game_state [4][8]int, move [4]int) ([4][8]int, int) {
 	isKing := false
+	captured := 0
 
 	// Pick up a piece
 	// Is it already a king?
@@ -205,7 +257,70 @@ func checkers_make_move(game_state [4][8]int, move [4]int) ([4][8]int, int) {
 
 	// TODO Complete this section
 	// Check if this move is a capture and remove opposing pieces
-	captured := 0
+	// If the difference in Y is 2, this move is a capture
+	if (move[3]-move[1])*(move[3]-move[1]) == 4 {
+		captured_x := -1
+		captured_y := -1
+
+		// How do I know where the captured piece is?
+		if move[2]-move[0] == 1 {
+			// Move is to the right
+			if move[1]%2 == 0 {
+				// Even rows
+				if (move[3] - move[1]) == -2 {
+					// Forward moves
+					captured_x = move[0] + 1
+					captured_y = move[1] - 1
+				} else {
+					// Backward moves
+					captured_x = move[0] + 1
+					captured_y = move[1] + 1
+				}
+			} else {
+				// Odd rows
+				if (move[3] - move[1]) == -2 {
+					// Forward moves
+					captured_x = move[0]
+					captured_y = move[1] - 1
+				} else {
+					// Backward moves
+					captured_x = move[0]
+					captured_y = move[1] + 1
+				}
+
+			}
+
+		} else if move[2]-move[1] == -1 {
+			// Move is to the left
+			if move[1]%2 == 0 {
+				// Even rows
+				if (move[3] - move[1]) == -2 {
+					// Forward moves
+					captured_x = move[0]
+					captured_y = move[1] - 1
+				} else {
+					// Backward moves
+					captured_x = move[0]
+					captured_y = move[1] + 1
+				}
+			} else {
+				// Odd rows
+				if (move[3] - move[1]) == -2 {
+					// Forward moves
+					captured_x = move[0] - 1
+					captured_y = move[1] - 1
+				} else {
+					// Backward moves
+					captured_x = move[0] - 1
+					captured_y = move[1] + 1
+				}
+
+			}
+		}
+
+		game_state[captured_x][captured_y] = 0
+		captured = 1
+	}
 
 	// Should the piece be kinged?
 	if move[3] == 0 {
