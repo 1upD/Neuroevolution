@@ -192,34 +192,34 @@ func calculate_checkers_captures_per_piece(game_state [4][8]int, checker [2]int,
 
 	}
 
-	//	if checker[1]%2 == 0 {
-	//		// Even rows
-	//		if y > 0 && x < 3 {
-	//			if game_state[x+1][y-1] == 0 {
-	//				moves = append(moves, [4]int{x, y, x + 1, y - 1})
-	//			}
-	//		}
-	//		// Kings can move backwards
-	//		if isKing && y < 7 && x > 0 {
-	//			if game_state[x-1][y+1] == 0 {
-	//				moves = append(moves, [4]int{x, y, x - 1, y + 1})
-	//			}
-	//		}
+	if checker[1]%2 == 0 {
+		// Even rows
+		if y > 1 && x < 3 {
+			if game_state[x+1][y-1] == -1 {
+				moves = append(moves, [4]int{x, y, x + 1, y - 2})
+			}
+		}
+		// Kings can move backwards
+		if isKing && y < 6 && x > 0 {
+			if game_state[x-1][y+1] == -1 {
+				moves = append(moves, [4]int{x, y, x - 1, y + 2})
+			}
+		}
 
-	//	} else {
-	//		// Odd rows
-	//		if y > 0 && x > 0 {
-	//			if game_state[x-1][y-1] == 0 {
-	//				moves = append(moves, [4]int{x, y, x - 1, y - 1})
-	//			}
-	//		}
-	//		// Kings can move backwards
-	//		if isKing && y < 7 && x < 3 {
-	//			if game_state[x+1][y+1] == 0 {
-	//				moves = append(moves, [4]int{x, y, x + 1, y + 1})
-	//			}
-	//		}
-	//	}
+	} else {
+		// Odd rows
+		if y > 1 && x > 0 {
+			if game_state[x-1][y-1] == 0 {
+				moves = append(moves, [4]int{x, y, x - 1, y - 2})
+			}
+		}
+		// Kings can move backwards
+		if isKing && y < 6 && x < 3 {
+			if game_state[x+1][y+1] == 0 {
+				moves = append(moves, [4]int{x, y, x + 1, y + 2})
+			}
+		}
+	}
 
 	return moves
 }
