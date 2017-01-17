@@ -10,25 +10,25 @@ import (
 
 //Checkers
 //
-//X	R	X	R	X	R	X	R
-//R	X	R	X	R	X	R	X
-//X	R	X	R	X	R	X	R
-//0	X	0	X	0	X	0	X
-//X	0	X	0	X	0	X	0
-//B	X	B	X	B	X	B	X
-//X	B	X	B	X	B	X	B
-//B	X	B	X	B	X	B	X
+// X	R	X	R	X	R	X	R
+// R	X	R	X	R	X	R	X
+// X	R	X	R	X	R	X	R
+// 0	X	0	X	0	X	0	X
+// X	0	X	0	X	0	X	0
+// B	X	B	X	B	X	B	X
+// X	B	X	B	X	B	X	B
+// B	X	B	X	B	X	B	X
 //
-//0	|	-1	-1	-1	-1
-//1	|	-1	-1	-1	-1
-//2	|	-1	-1	-1	-1
-//3	|	 0	 0	 0	 0
-//4	|	 0	 0	 0	 0
-//5	|	 1	 1	 1	 1
-//6	|	 1	 1	 1	 1
-//7	|	 1	 1	 1	 1
+//0	|	 0	-1	 0	-1 	 0	-1	 0	-1
+//1	|	-1	 0	-1	 0	-1	 0	-1	 0
+//2	|	 0	-1	 0	-1	 0	-1	 0	-1
+//3	|	 0	 0	 0	 0	 0	 0	 0	 0
+//4	|	 0	 0	 0	 0	 0	 0	 0	 0
+//5	|	 1	 0	 1	 0	 1	 0	 1	 0
+//6	|	 0	 1	 0	 1	 0	 1	 0	 1
+//7	|	 1	 0	 1	 0	 1	 0	 1	 0
 //		 -	 -	 - 	 -
-//		 0	 1	 2	 3
+//		 0	 1	 2	 3	4	5	6	7
 //
 //
 // Possible moves
@@ -44,10 +44,15 @@ import (
 func Checkers(black_player Player, red_player Player) int {
 	// There are four functional columns with 8 rows.
 	// I used columns first for easier indexing.
-	game_state := [4][8]int{[8]int{-1, -1, -1, 0, 0, 1, 1, 1},
-		[8]int{-1, -1, -1, 0, 0, 1, 1, 1},
-		[8]int{-1, -1, -1, 0, 0, 1, 1, 1},
-		[8]int{-1, -1, -1, 0, 0, 1, 1, 1}}
+	game_state := [8][8]int{
+		[8]int{0, -1, 0, 0, 0, 1, 0, 1},
+		[8]int{-1, 0, -1, 0, 0, 0, 1, 0},
+		[8]int{0, -1, 0, 0, 0, 1, 0, 1},
+		[8]int{-1, 0, -1, 0, 0, 0, 1, 0},
+		[8]int{0, -1, 0, 0, 0, 1, 0, 1},
+		[8]int{-1, 0, -1, 0, 0, 0, 1, 0},
+		[8]int{0, -1, 0, 0, 0, 1, 0, 1},
+		[8]int{-1, 0, -1, 0, 0, 0, 1, 0}}
 
 	// Number of pieces taken from the opponent. When this number reaches the
 	// number of checkers on that side (12) the game is over.
@@ -100,11 +105,11 @@ func Checkers(black_player Player, red_player Player) int {
 }
 
 // Calculates all possible normal moves for the black player on a checkers board
-func calculate_checkers_moves(game_state [4][8]int) []interface{} {
+func calculate_checkers_moves(game_state [8][8]int) []interface{} {
 	moves := []interface{}{}
 	// TODO Use goroutines and channels to speed this up!
 
-	for i := 0; i < 4; i++ {
+	for i := 0; i < 8; i++ {
 		for j := 0; j < 8; j++ {
 			if game_state[i][j] > 0 {
 				moves = append(moves, calculate_checkers_moves_per_piece(game_state, [2]int{i, j}, game_state[i][j] == 2)...)
@@ -117,111 +122,60 @@ func calculate_checkers_moves(game_state [4][8]int) []interface{} {
 }
 
 // Calculate capture moves for a given black checker on a checkers board
-func calculate_checkers_moves_per_piece(game_state [4][8]int, checker [2]int, isKing bool) []interface{} {
+func calculate_checkers_moves_per_piece(game_state [8][8]int, checker [2]int, isKing bool) []interface{} {
 	moves := []interface{}{}
 	x := checker[0]
 	y := checker[1]
 
-	if y > 0 && game_state[x][y-1] == 0 {
-		moves = append(moves, [4]int{x, y, x, y - 1})
+	// Upper left diagonal
+	if x > 0 && y > 0 && game_state[x-1][y-1] == 0 {
+		moves = append(moves, [4]int{x, y, x - 1, y - 1})
 	}
 
-	if isKing && y < 7 && game_state[x][y+1] == 0 {
-		moves = append(moves, [4]int{x, y, x, y + 1})
+	// Lower left diagonal
+	if isKing && x > 0 && y < 8 && game_state[x-1][y+1] == 0 {
+		moves = append(moves, [4]int{x, y, x - 1, y + 1})
 	}
 
-	if checker[1]%2 == 0 {
-		// Even rows
-		if y > 0 && x < 3 {
-			if game_state[x+1][y-1] == 0 {
-				moves = append(moves, [4]int{x, y, x + 1, y - 1})
-			}
-		}
-		// Kings can move backwards
-		if isKing && y < 7 && x > 0 {
-			if game_state[x-1][y+1] == 0 {
-				moves = append(moves, [4]int{x, y, x - 1, y + 1})
-			}
-		}
+	// Upper right diagonal
+	if x < 7 && y > 0 && game_state[x+1][y-1] == 0 {
+		moves = append(moves, [4]int{x, y, x + 1, y - 1})
 
-	} else {
-		// Odd rows
-		if y > 0 && x > 0 {
-			if game_state[x-1][y-1] == 0 {
-				moves = append(moves, [4]int{x, y, x - 1, y - 1})
-			}
-		}
-		// Kings can move backwards
-		if isKing && y < 7 && x < 3 {
-			if game_state[x+1][y+1] == 0 {
-				moves = append(moves, [4]int{x, y, x + 1, y + 1})
-			}
-		}
+	}
+
+	// Lower right diagonal
+	if isKing && x < 7 && y < 7 && game_state[x+1][y+1] == 0 {
+		moves = append(moves, [4]int{x, y, x + 1, y + 1})
 	}
 
 	return moves
 }
 
 // Calculate capture moves for a given black checker on a checkers board
-func calculate_checkers_captures_per_piece(game_state [4][8]int, checker [2]int, isKing bool) []interface{} {
+func calculate_checkers_captures_per_piece(game_state [8][8]int, checker [2]int, isKing bool) []interface{} {
 	moves := []interface{}{}
 	x := checker[0]
 	y := checker[1]
 
-	// Is the space diagonal to the given pice (in the same space pair) occupied
-	// by an opponent piece?
-	// This is a little bit confusing.
-	if y > 1 && game_state[x][y-1] < 0 {
-		// Is the piece to be jumped in an even or odd row?
-		if x > 0 && (y-1)%2 == 0 {
-			//
-			moves = append(moves, [4]int{x, y, x - 1, y - 2})
-
-		} else if x < 3 {
-			moves = append(moves, [4]int{x, y, x + 1, y - 2})
-		}
-
+	// Upper left diagonal
+	if x > 1 && y > 1 && game_state[x-1][y-1] < 0 && game_state[x-2][y-2] == 0 {
+		moves = append(moves, [4]int{x, y, x - 2, y - 2})
 	}
-	// If this is a king, check backwards
-	if isKing && y < 7 && game_state[x][y+1] < 0 {
-		// Is the piece to be jumped in an even or odd row?
-		if (y-1)%2 == 0 {
-			//
-			moves = append(moves, [4]int{x, y, x + 1, y + 2})
 
-		} else {
-			moves = append(moves, [4]int{x, y, x - 1, y + 2})
-		}
+	// Lower left diagonal
+	if isKing && x > 1 && y < 6 && game_state[x-1][y+1] < 0 && game_state[x-2][y+2] == 0 {
+		moves = append(moves, [4]int{x, y, x - 2, y + 2})
+	}
+
+	// Upper right diagonal
+	if x < 6 && y > 1 && game_state[x+1][y-1] < 0 && game_state[x+2][y-2] == 0 {
+		moves = append(moves, [4]int{x, y, x + 2, y - 2})
 
 	}
 
-	if checker[1]%2 == 0 {
-		// Even rows
-		if y > 1 && x < 3 {
-			if game_state[x+1][y-1] < 0 && game_state[x+1][y-2] == 0 {
-				moves = append(moves, [4]int{x, y, x + 1, y - 2})
-			}
-		}
-		// Kings can move backwards
-		if isKing && y < 6 && x > 0 {
-			if game_state[x-1][y+1] < 0 && game_state[x-1][y+2] == 0 {
-				moves = append(moves, [4]int{x, y, x - 1, y + 2})
-			}
-		}
-
-	} else {
-		// Odd rows
-		if y > 1 && x > 0 {
-			if game_state[x-1][y-1] < 0 && game_state[x-1][y-2] == 0 {
-				moves = append(moves, [4]int{x, y, x - 1, y - 2})
-			}
-		}
-		// Kings can move backwards
-		if isKing && y < 6 && x < 3 {
-			if game_state[x+1][y+1] < 0 && game_state[x+1][y+2] == 0 {
-				moves = append(moves, [4]int{x, y, x + 1, y + 2})
-			}
-		}
+	// Lower right diagonal
+	if isKing && x < 6 && y < 6 && game_state[x+1][y+1] < 0 && game_state[x+2][y+2] == 0 {
+		moves = append(moves, [4]int{x, y, x + 2, y + 2})
 	}
 
 	return moves
@@ -230,14 +184,19 @@ func calculate_checkers_captures_per_piece(game_state [4][8]int, checker [2]int,
 // Given a checkers board configuration, flip the board so that red player is now
 // black player and vice versa. This way all players will see themselves as black
 // player.
-func checkers_board_flip(game_state [4][8]int) [4][8]int {
-	flip_state := [4][8]int{[8]int{-1, -1, -1, 0, 0, 1, 1, 1},
-		[8]int{-1, -1, -1, 0, 0, 1, 1, 1},
-		[8]int{-1, -1, -1, 0, 0, 1, 1, 1},
-		[8]int{-1, -1, -1, 0, 0, 1, 1, 1}}
-	for i := 0; i < 4; i++ {
+func checkers_board_flip(game_state [8][8]int) [8][8]int {
+	flip_state := [8][8]int{
+		[8]int{0, -1, 0, 0, 0, 1, 0, 1},
+		[8]int{-1, 0, -1, 0, 0, 0, 1, 0},
+		[8]int{0, -1, 0, 0, 0, 1, 0, 1},
+		[8]int{-1, 0, -1, 0, 0, 0, 1, 0},
+		[8]int{0, -1, 0, 0, 0, 1, 0, 1},
+		[8]int{-1, 0, -1, 0, 0, 0, 1, 0},
+		[8]int{0, -1, 0, 0, 0, 1, 0, 1},
+		[8]int{-1, 0, -1, 0, 0, 0, 1, 0}}
+	for i := 0; i < 8; i++ {
 		for j := 0; j < 8; j++ {
-			flip_state[i][j] = -1 * game_state[3-i][7-j]
+			flip_state[i][j] = -1 * game_state[7-i][7-j]
 		}
 	}
 
@@ -246,7 +205,7 @@ func checkers_board_flip(game_state [4][8]int) [4][8]int {
 
 // Given a board state and a valid move, make the move
 // Returns a board state and the number of captures
-func checkers_make_move(game_state [4][8]int, move [4]int) ([4][8]int, int) {
+func checkers_make_move(game_state [8][8]int, move [4]int) ([8][8]int, int) {
 	fmt.Println("Move made: ", move)
 
 	isKing := false
@@ -265,64 +224,8 @@ func checkers_make_move(game_state [4][8]int, move [4]int) ([4][8]int, int) {
 	// If the difference in Y is 2, this move is a capture
 	fmt.Println("\nIs this a capture? ", (move[3]-move[1])*(move[3]-move[1]))
 	if (move[3]-move[1])*(move[3]-move[1]) == 4 {
-		captured_x := -1
-		captured_y := -1
-
-		// How do I know where the captured piece is?
-		if move[2]-move[0] == 1 {
-			// Move is to the right
-			if move[1]%2 == 0 {
-				// Even rows
-				if (move[3] - move[1]) == -2 {
-					// Forward moves
-					captured_x = move[0] + 1
-					captured_y = move[1] - 1
-				} else {
-					// Backward moves
-					captured_x = move[0] + 1
-					captured_y = move[1] + 1
-				}
-			} else {
-				// Odd rows
-				if (move[3] - move[1]) == -2 {
-					// Forward moves
-					captured_x = move[0]
-					captured_y = move[1] - 1
-				} else {
-					// Backward moves
-					captured_x = move[0]
-					captured_y = move[1] + 1
-				}
-
-			}
-
-		} else if move[2]-move[1] == -1 {
-			// Move is to the left
-			if move[1]%2 == 0 {
-				// Even rows
-				if (move[3] - move[1]) == -2 {
-					// Forward moves
-					captured_x = move[0]
-					captured_y = move[1] - 1
-				} else {
-					// Backward moves
-					captured_x = move[0]
-					captured_y = move[1] + 1
-				}
-			} else {
-				// Odd rows
-				if (move[3] - move[1]) == -2 {
-					// Forward moves
-					captured_x = move[0] - 1
-					captured_y = move[1] - 1
-				} else {
-					// Backward moves
-					captured_x = move[0] - 1
-					captured_y = move[1] + 1
-				}
-
-			}
-		}
+		captured_x := (move[0] + move[2]) / 2
+		captured_y := (move[1] + move[3]) / 2
 
 		game_state[captured_x][captured_y] = 0
 		captured = 1
@@ -348,16 +251,16 @@ func checkers_make_move(game_state [4][8]int, move [4]int) ([4][8]int, int) {
 
 // This function prints a game state to the console and prompts the user to select a move.
 func HumanCheckersPlayer(game_state interface{}, moves []interface{}) interface{} {
-	state := game_state.([4][8]int)
-	fmt.Printf("\n0:\tX\t%v\tX\t%v\tX\t%v\tX\t%v", state[0][0], state[1][0], state[2][0], state[3][0])
-	fmt.Printf("\n1:\t%v\tX\t%v\tX\t%v\tX\t%v\tX", state[0][1], state[1][1], state[2][1], state[3][1])
-	fmt.Printf("\n2:\tX\t%v\tX\t%v\tX\t%v\tX\t%v", state[0][2], state[1][2], state[2][2], state[3][2])
-	fmt.Printf("\n3:\t%v\tX\t%v\tX\t%v\tX\t%v\tX", state[0][3], state[1][3], state[2][3], state[3][3])
-	fmt.Printf("\n4:\tX\t%v\tX\t%v\tX\t%v\tX\t%v", state[0][4], state[1][4], state[2][4], state[3][4])
-	fmt.Printf("\n5:\t%v\tX\t%v\tX\t%v\tX\t%v\tX", state[0][5], state[1][5], state[2][5], state[3][5])
-	fmt.Printf("\n6:\tX\t%v\tX\t%v\tX\t%v\tX\t%v", state[0][6], state[1][6], state[2][6], state[3][6])
-	fmt.Printf("\n7:\t%v\tX\t%v\tX\t%v\tX\t%v\tX", state[0][7], state[1][7], state[2][7], state[3][7])
-	fmt.Println("\n\n-:\t0\t0\t1\t1\t2\t2\t3\t3\t")
+	state := game_state.([8][8]int)
+	fmt.Printf("\n0:\t \t%v\t \t%v\t \t%v\t \t%v", state[1][0], state[3][0], state[5][0], state[7][0])
+	fmt.Printf("\n1:\t%v\t \t%v\t \t%v\t \t%v\t ", state[0][1], state[2][1], state[4][1], state[6][1])
+	fmt.Printf("\n2:\t \t%v\t \t%v\t \t%v\t \t%v", state[1][2], state[3][2], state[5][2], state[7][2])
+	fmt.Printf("\n3:\t%v\t \t%v\t \t%v\t \t%v\t ", state[0][3], state[2][3], state[4][3], state[6][3])
+	fmt.Printf("\n4:\t \t%v\t \t%v\t \t%v\t \t%v", state[1][4], state[3][4], state[5][4], state[7][4])
+	fmt.Printf("\n5:\t%v\t \t%v\t \t%v\t \t%v\t ", state[0][5], state[2][5], state[4][5], state[6][5])
+	fmt.Printf("\n6:\t \t%v\t \t%v\t \t%v\t \t%v", state[1][6], state[3][6], state[5][6], state[7][6])
+	fmt.Printf("\n7:\t%v\t \t%v\t \t%v\t \t%v\t ", state[0][7], state[2][7], state[4][7], state[6][7])
+	fmt.Println("\n\n-:\t0\t1\t2\t3\t4\t5\t6\t7\t")
 
 	fmt.Println("\nWhat is your move? ")
 	fmt.Printf("\nPossible moves: %v", moves)
@@ -365,7 +268,6 @@ func HumanCheckersPlayer(game_state interface{}, moves []interface{}) interface{
 	reader := bufio.NewReader(os.Stdin)
 	for {
 		fmt.Println("\nChoose an X coordinate: ")
-		fmt.Println("\nEnter an integer 0-3: ")
 		text, _ := reader.ReadString('\n')
 		x1, err := strconv.Atoi(strings.Trim(text, "\n\r"))
 
@@ -374,7 +276,6 @@ func HumanCheckersPlayer(game_state interface{}, moves []interface{}) interface{
 		}
 
 		fmt.Println("\nChoose a Y coordinate: ")
-		fmt.Println("\nEnter an integer 0-7: ")
 		text, _ = reader.ReadString('\n')
 		y1, err := strconv.Atoi(strings.Trim(text, "\n\r"))
 
@@ -383,7 +284,6 @@ func HumanCheckersPlayer(game_state interface{}, moves []interface{}) interface{
 		}
 
 		fmt.Println("\nChoose an X coordinate: ")
-		fmt.Println("\nEnter an integer 0-3: ")
 		text, _ = reader.ReadString('\n')
 		x2, err := strconv.Atoi(strings.Trim(text, "\n\r"))
 
@@ -392,7 +292,6 @@ func HumanCheckersPlayer(game_state interface{}, moves []interface{}) interface{
 		}
 
 		fmt.Println("\nChoose a Y coordinate: ")
-		fmt.Println("\nEnter an integer 0-7: ")
 		text, _ = reader.ReadString('\n')
 		y2, err := strconv.Atoi(strings.Trim(text, "\n\r"))
 
