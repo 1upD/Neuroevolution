@@ -42,65 +42,72 @@ import (
 // else y == 6
 // y -1, y-1 x+1
 func Checkers(black_player Player, red_player Player) int {
-	// There are four functional columns with 8 rows.
-	// I used columns first for easier indexing.
-	game_state := [8][8]int{
-		[8]int{0, -1, 0, 0, 0, 1, 0, 1},
-		[8]int{-1, 0, -1, 0, 0, 0, 1, 0},
-		[8]int{0, -1, 0, 0, 0, 1, 0, 1},
-		[8]int{-1, 0, -1, 0, 0, 0, 1, 0},
-		[8]int{0, -1, 0, 0, 0, 1, 0, 1},
-		[8]int{-1, 0, -1, 0, 0, 0, 1, 0},
-		[8]int{0, -1, 0, 0, 0, 1, 0, 1},
-		[8]int{-1, 0, -1, 0, 0, 0, 1, 0}}
+	return MakeCheckers(0)(black_player, red_player)
+}
 
-	// Number of pieces taken from the opponent. When this number reaches the
-	// number of checkers on that side (12) the game is over.
-	red_score := 0
-	black_score := 0
+// Factory function returns a variant of checkers given a turn limit
+func MakeCheckers(turn_limit int) Game {
+	return func(black_player Player, red_player Player) int {
+		// There are four functional columns with 8 rows.
+		// I used columns first for easier indexing.
+		game_state := [8][8]int{
+			[8]int{0, -1, 0, 0, 0, 1, 0, 1},
+			[8]int{-1, 0, -1, 0, 0, 0, 1, 0},
+			[8]int{0, -1, 0, 0, 0, 1, 0, 1},
+			[8]int{-1, 0, -1, 0, 0, 0, 1, 0},
+			[8]int{0, -1, 0, 0, 0, 1, 0, 1},
+			[8]int{-1, 0, -1, 0, 0, 0, 1, 0},
+			[8]int{0, -1, 0, 0, 0, 1, 0, 1},
+			[8]int{-1, 0, -1, 0, 0, 0, 1, 0}}
 
-	// Moves should store arrays of four integers where the first two represent
-	// a coordinate pair of the piece to be moved and the second two represent the
-	// space to move to.
-	var moves []interface{}
-	var move_score int
-	var player_move [4]int
+		// Number of pieces taken from the opponent. When this number reaches the
+		// number of checkers on that side (12) the game is over.
+		red_score := 0
+		black_score := 0
 
-	// Main game loop
-	for red_score < 12 && black_score < 12 {
-		// Black player move
-		moves = calculate_checkers_moves(game_state)
-		for len(moves) > 0 {
-			//			fmt.Println("Black player's turn")
-			player_move = black_player(game_state, moves).([4]int)
-			game_state, move_score = checkers_make_move(game_state, player_move)
-			moves = calculate_checkers_captures_per_piece(game_state, [2]int{player_move[2], player_move[3]}, game_state[player_move[2]][player_move[3]] == 2)
-			black_score += move_score
+		// Moves should store arrays of four integers where the first two represent
+		// a coordinate pair of the piece to be moved and the second two represent the
+		// space to move to.
+		var moves []interface{}
+		var move_score int
+		var player_move [4]int
+
+		// Main game loop
+		for turn := 0; red_score < 12 && black_score < 12 && turn < turn_limit; turn++ {
+			// Black player move
+			moves = calculate_checkers_moves(game_state)
+			for len(moves) > 0 {
+				//			fmt.Println("Black player's turn")
+				player_move = black_player(game_state, moves).([4]int)
+				game_state, move_score = checkers_make_move(game_state, player_move)
+				moves = calculate_checkers_captures_per_piece(game_state, [2]int{player_move[2], player_move[3]}, game_state[player_move[2]][player_move[3]] == 2)
+				black_score += move_score
+			}
+
+			// Flip the board in preparation for red player
+			game_state = checkers_board_flip(game_state)
+			moves = calculate_checkers_moves(game_state)
+
+			// Red player move
+			for len(moves) > 0 {
+				//			fmt.Println("Red player's turn")
+
+				player_move = red_player(game_state, moves).([4]int)
+				game_state, move_score = checkers_make_move(game_state, player_move)
+				moves = calculate_checkers_captures_per_piece(game_state, [2]int{player_move[2], player_move[3]}, game_state[player_move[2]][player_move[3]] == 2)
+				red_score += move_score
+			}
+
+			// Flip board back
+			game_state = checkers_board_flip(game_state)
+
 		}
 
-		// Flip the board in preparation for red player
-		game_state = checkers_board_flip(game_state)
-		moves = calculate_checkers_moves(game_state)
-
-		// Red player move
-		for len(moves) > 0 {
-			//			fmt.Println("Red player's turn")
-
-			player_move = red_player(game_state, moves).([4]int)
-			game_state, move_score = checkers_make_move(game_state, player_move)
-			moves = calculate_checkers_captures_per_piece(game_state, [2]int{player_move[2], player_move[3]}, game_state[player_move[2]][player_move[3]] == 2)
-			red_score += move_score
+		if black_score > red_score {
+			return 1
+		} else {
+			return -1
 		}
-
-		// Flip board back
-		game_state = checkers_board_flip(game_state)
-
-	}
-
-	if black_score > red_score {
-		return 1
-	} else {
-		return -1
 	}
 }
 
@@ -133,7 +140,7 @@ func calculate_checkers_moves_per_piece(game_state [8][8]int, checker [2]int, is
 	}
 
 	// Lower left diagonal
-	if isKing && x > 0 && y < 8 && game_state[x-1][y+1] == 0 {
+	if isKing && x > 0 && y < 7 && game_state[x-1][y+1] == 0 {
 		moves = append(moves, [4]int{x, y, x - 1, y + 1})
 	}
 
@@ -281,7 +288,7 @@ func CheckersPlayerMaker(a Agent) Player {
 			j := 0
 
 			if i%2 == 0 {
-				i = 1
+				j = 1
 			}
 
 			for j < 8 {
@@ -304,7 +311,7 @@ func CheckersPlayerMaker(a Agent) Player {
 			j := 0
 
 			if i%2 == 0 {
-				i = 1
+				j = 1
 			}
 
 			for j < 8 {

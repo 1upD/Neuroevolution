@@ -53,13 +53,39 @@ func testTicTacToe() {
 }
 
 func testCheckers() {
+	// Seed the initial population
+	pop_size := 100
+	pop := make([]games.Agent, pop_size)
+	for i := 0; i < pop_size; i++ {
+		pop[i] = neuralnetwork.RandomNetwork(65, 130, 24)
+	}
+
+	evolved_agent := evolution.EvolveAgents(games.MakeCheckers(100), games.CheckersPlayerMaker,
+		512, 64, pop)
+
+	fmt.Println("Training complete!")
+
 	for {
-		victor := games.Checkers(games.HumanCheckersPlayer, games.HumanCheckersPlayer)
+		victor := games.Checkers(games.CheckersPlayerMaker(evolved_agent), games.HumanTicTacToePlayer)
 		if victor == -1 {
 			fmt.Println("\n\nYou win!")
 		} else if victor == 0 {
 			fmt.Println("\n\nDraw!")
 		} else if victor == 1 {
+			fmt.Println("\n\nYou lose!")
+		}
+	}
+
+}
+
+func testRandomCheckers() {
+	for {
+		victor := games.Checkers(games.HumanCheckersPlayer, games.RandomPlayer)
+		if victor == 1 {
+			fmt.Println("\n\nYou win!")
+		} else if victor == 0 {
+			fmt.Println("\n\nDraw!")
+		} else if victor == -1 {
 			fmt.Println("\n\nYou lose!")
 		}
 	}
