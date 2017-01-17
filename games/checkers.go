@@ -71,7 +71,7 @@ func Checkers(black_player Player, red_player Player) int {
 		// Black player move
 		moves = calculate_checkers_moves(game_state)
 		for len(moves) > 0 {
-			fmt.Println("Black player's turn")
+			//			fmt.Println("Black player's turn")
 			player_move = black_player(game_state, moves).([4]int)
 			game_state, move_score = checkers_make_move(game_state, player_move)
 			moves = calculate_checkers_captures_per_piece(game_state, [2]int{player_move[2], player_move[3]}, game_state[player_move[2]][player_move[3]] == 2)
@@ -84,7 +84,7 @@ func Checkers(black_player Player, red_player Player) int {
 
 		// Red player move
 		for len(moves) > 0 {
-			fmt.Println("Red player's turn")
+			//			fmt.Println("Red player's turn")
 
 			player_move = red_player(game_state, moves).([4]int)
 			game_state, move_score = checkers_make_move(game_state, player_move)
@@ -206,7 +206,7 @@ func checkers_board_flip(game_state [8][8]int) [8][8]int {
 // Given a board state and a valid move, make the move
 // Returns a board state and the number of captures
 func checkers_make_move(game_state [8][8]int, move [4]int) ([8][8]int, int) {
-	fmt.Println("Move made: ", move)
+	//	fmt.Println("Move made: ", move)
 
 	isKing := false
 	captured := 0
@@ -222,7 +222,7 @@ func checkers_make_move(game_state [8][8]int, move [4]int) ([8][8]int, int) {
 	// TODO Complete this section
 	// Check if this move is a capture and remove opposing pieces
 	// If the difference in Y is 2, this move is a capture
-	fmt.Println("\nIs this a capture? ", (move[3]-move[1])*(move[3]-move[1]))
+	//	fmt.Println("\nIs this a capture? ", (move[3]-move[1])*(move[3]-move[1]))
 	if (move[3]-move[1])*(move[3]-move[1]) == 4 {
 		captured_x := (move[0] + move[2]) / 2
 		captured_y := (move[1] + move[3]) / 2
@@ -247,6 +247,114 @@ func checkers_make_move(game_state [8][8]int, move [4]int) ([8][8]int, int) {
 
 	// Return the game state
 	return game_state, captured
+}
+
+// Given an agent that accepts 65 inputs and classifies 24 outputs, this function
+// creates a player for that agent that may be used in Checkers.
+//
+// Breakdown of inputs and outputs:
+// I tried to minimize the number of inputs and outputs to speed up the agent.
+// The Checkerboard is fed into the network as an 8x4 grid, ommitting the light
+// spaces on the board
+//
+// The first input is an activation neuron that is always 1.
+//
+// Each space is given one input with a value of 0 for no piece, -1 for red piece
+// or 1 for black piece. These three cases should be separate binary inputs but
+// for maximum speed I've opted to consider them opposites.
+//
+// The final 32 inputs represent whether the piece at the given space is a king
+// or not.
+//
+// As for the outputs, the 24 outputs represent two sets of twelve coordinates on
+// the 8x4 grid represented in binary.
+//
+// The player's move is chosen by examining each valid move, summing up the
+// predictions on that moves coordinates, and choosing the maximum summed prediction.
+func CheckersPlayerMaker(a Agent) Player {
+	return func(game_state interface{}, moves []interface{}) interface{} {
+		// Activation input - always on
+		inputs := []float64{1.0}
+
+		// The first 32 inputs represent which side the space belongs to
+		for i := 0; i < 8; i++ {
+			j := 0
+
+			if i%2 == 0 {
+				i = 1
+			}
+
+			for j < 8 {
+				val := game_state.([8][8]int)[i][j]
+				if val < 0 {
+					inputs = append(inputs, -1.0)
+				} else if val > 0 {
+					inputs = append(inputs, 1.0)
+				} else {
+					inputs = append(inputs, 0.0)
+				}
+
+				j += 2
+			}
+
+		}
+
+		// The last 32 inputs represent whether or not the piece on a space is a king
+		for i := 0; i < 8; i++ {
+			j := 0
+
+			if i%2 == 0 {
+				i = 1
+			}
+
+			for j < 8 {
+				val := game_state.([8][8]int)[i][j]
+				if val*val == 4 {
+					inputs = append(inputs, 1.0)
+				} else {
+					inputs = append(inputs, 0.0)
+				}
+
+				j += 2
+			}
+
+		}
+
+		prediction := a.Predict(inputs)
+
+		max_choice := moves[0]
+		max_val := -999.0
+		for i := 0; i < len(moves); i++ {
+			move := moves[i].([4]int)
+			move_val := 0.0
+
+			// First x-coord
+			x1 := move[0] / 2 // Do integer division on the X-coords because
+			// we can ignore half of the spaces
+
+			move_val += prediction[x1] // Range: 0 - 3
+
+			y1 := move[1]
+			move_val += prediction[4+y1] // Range 4 - 11
+
+			// First x-coord
+			x2 := move[2] / 2 // Do integer division on the X-coords because
+			// we can ignore half of the spaces
+
+			move_val += prediction[12+x2] // Range: 12 - 15
+
+			y2 := move[3]
+			move_val += prediction[16+y2] // Range 16 - 23
+
+			if move_val > max_val {
+				max_val = move_val
+				max_choice = move
+			}
+		}
+
+		return max_choice
+
+	}
 }
 
 // This function prints a game state to the console and prompts the user to select a move.
