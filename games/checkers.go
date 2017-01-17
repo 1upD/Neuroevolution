@@ -66,6 +66,7 @@ func Checkers(black_player Player, red_player Player) int {
 		// Black player move
 		moves = calculate_checkers_moves(game_state)
 		for len(moves) > 0 {
+			fmt.Println("Black player's turn")
 			player_move = black_player(game_state, moves).([4]int)
 			game_state, move_score = checkers_make_move(game_state, player_move)
 			moves = calculate_checkers_captures_per_piece(game_state, [2]int{player_move[2], player_move[3]}, game_state[player_move[2]][player_move[3]] == 2)
@@ -78,6 +79,8 @@ func Checkers(black_player Player, red_player Player) int {
 
 		// Red player move
 		for len(moves) > 0 {
+			fmt.Println("Red player's turn")
+
 			player_move = red_player(game_state, moves).([4]int)
 			game_state, move_score = checkers_make_move(game_state, player_move)
 			moves = calculate_checkers_captures_per_piece(game_state, [2]int{player_move[2], player_move[3]}, game_state[player_move[2]][player_move[3]] == 2)
@@ -168,7 +171,7 @@ func calculate_checkers_captures_per_piece(game_state [4][8]int, checker [2]int,
 	// Is the space diagonal to the given pice (in the same space pair) occupied
 	// by an opponent piece?
 	// This is a little bit confusing.
-	if y > 1 && game_state[x][y-1] == -1 {
+	if y > 1 && game_state[x][y-1] < 0 {
 		// Is the piece to be jumped in an even or odd row?
 		if x > 0 && (y-1)%2 == 0 {
 			//
@@ -180,7 +183,7 @@ func calculate_checkers_captures_per_piece(game_state [4][8]int, checker [2]int,
 
 	}
 	// If this is a king, check backwards
-	if isKing && y < 7 && game_state[x][y+1] == -1 {
+	if isKing && y < 7 && game_state[x][y+1] < 0 {
 		// Is the piece to be jumped in an even or odd row?
 		if (y-1)%2 == 0 {
 			//
@@ -195,13 +198,13 @@ func calculate_checkers_captures_per_piece(game_state [4][8]int, checker [2]int,
 	if checker[1]%2 == 0 {
 		// Even rows
 		if y > 1 && x < 3 {
-			if game_state[x+1][y-1] == -1 {
+			if game_state[x+1][y-1] < 0 && game_state[x+1][y-2] == 0 {
 				moves = append(moves, [4]int{x, y, x + 1, y - 2})
 			}
 		}
 		// Kings can move backwards
 		if isKing && y < 6 && x > 0 {
-			if game_state[x-1][y+1] == -1 {
+			if game_state[x-1][y+1] < 0 && game_state[x-1][y+2] == 0 {
 				moves = append(moves, [4]int{x, y, x - 1, y + 2})
 			}
 		}
@@ -209,13 +212,13 @@ func calculate_checkers_captures_per_piece(game_state [4][8]int, checker [2]int,
 	} else {
 		// Odd rows
 		if y > 1 && x > 0 {
-			if game_state[x-1][y-1] == 0 {
+			if game_state[x-1][y-1] < 0 && game_state[x-1][y-2] == 0 {
 				moves = append(moves, [4]int{x, y, x - 1, y - 2})
 			}
 		}
 		// Kings can move backwards
 		if isKing && y < 6 && x < 3 {
-			if game_state[x+1][y+1] == 0 {
+			if game_state[x+1][y+1] < 0 && game_state[x+1][y+2] == 0 {
 				moves = append(moves, [4]int{x, y, x + 1, y + 2})
 			}
 		}
@@ -244,6 +247,8 @@ func checkers_board_flip(game_state [4][8]int) [4][8]int {
 // Given a board state and a valid move, make the move
 // Returns a board state and the number of captures
 func checkers_make_move(game_state [4][8]int, move [4]int) ([4][8]int, int) {
+	fmt.Println("Move made: ", move)
+
 	isKing := false
 	captured := 0
 
@@ -258,6 +263,7 @@ func checkers_make_move(game_state [4][8]int, move [4]int) ([4][8]int, int) {
 	// TODO Complete this section
 	// Check if this move is a capture and remove opposing pieces
 	// If the difference in Y is 2, this move is a capture
+	fmt.Println("\nIs this a capture? ", (move[3]-move[1])*(move[3]-move[1]))
 	if (move[3]-move[1])*(move[3]-move[1]) == 4 {
 		captured_x := -1
 		captured_y := -1
