@@ -73,7 +73,7 @@ func MakeCheckers(turn_limit int) Game {
 		var player_move [4]int
 
 		// Main game loop
-		for turn := 0; red_score < 12 && black_score < 12 && turn < turn_limit; turn++ {
+		for turn := 0; red_score < 12 && black_score < 12 && (turn_limit < 1 || turn < turn_limit); turn++ {
 			// Black player move
 			moves = calculate_checkers_moves(game_state)
 			for len(moves) > 0 {
