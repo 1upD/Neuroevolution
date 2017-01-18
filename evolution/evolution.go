@@ -40,6 +40,17 @@ func EvolveAgents(g games.Game, playerMaker games.PlayerMaker, generations int,
 		for j := 0; j < len(pop); j++ { // TODO Why is this minus one!?
 			index := j
 			go func() {
+				// TODO Running the trials until a loss is unreliable because
+				// of the randomness in the game. Consider instead running a fixed
+				// number of trials and computing fitness as a percentage of those
+				// trials. Agents have an expected fitness of 50%, treat them accordingly.
+				// The only problem with running the maximum number of trials is that
+				// it slows the algorithm down substantially; stopping after the first
+				// loss quickly prunes the population. Perhaps I should instead
+				// run a small number of trials, say 10, and if it reaches the maximum
+				// continue running it until there is a loss? Then use the percentage
+				// as the fitness score.
+
 				score := 0
 				player := playerMaker(pop[index])
 				// Keep testing this player until the maximum number of games is

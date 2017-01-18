@@ -1,7 +1,6 @@
 package neuralnetwork
 
 import (
-	"math"
 	"math/rand"
 
 	"github.com/CRRDerek/Neuroevolution/games"
@@ -102,6 +101,10 @@ func RandomNetwork(num_inputs, num_hiddens, num_outputs int) games.Agent {
 	return n
 }
 
+// Implements the Agent interface. Used by evolutionary algorithms to mate two
+// networks together.
+//
+// Other must also be this type of neural network for this to work!
 func (n neuralNetwork) Mate(other games.Agent) games.Agent {
 	o := other.(*neuralNetwork)
 	return mate(&n, o)
@@ -170,20 +173,4 @@ func mate(p1 *neuralNetwork, p2 *neuralNetwork) *neuralNetwork {
 
 	return n
 
-}
-
-// Given a number of inputs, an array of inputs, and an array of weight values,
-// calculate the output of a single neuron. This function works regardless of
-// whether the neuron is in a hidden layer or the output layer.
-// This version of activate_neuron has been replaced by the method in Neuron.go
-// TODO Consider for deletion.
-func activate_neuron(num_inputs int, neuron_inputs []float64, neuron_weights []float64) float64 {
-	weighted_input := 0.0
-	// Add each input value multiplied by the weight associated to calculate
-	// the sum weighted input for this neuron.
-	for i := 0; i < num_inputs; i++ {
-		weighted_input += neuron_inputs[i] * neuron_weights[i]
-	}
-	// Using the inverse tangent as a sigmoid function
-	return math.Tanh(weighted_input)
 }

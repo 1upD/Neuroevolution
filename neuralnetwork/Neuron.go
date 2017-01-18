@@ -14,7 +14,6 @@ type neuron struct {
 	num_inputs int
 
 	// This variable is used to store the sum of weighted inputs.
-	// TODO Is it faster to declare a new variable in the function?
 	weighted_input float64
 
 	// This slice contains the weights of this particular neuron.
@@ -58,6 +57,6 @@ func (n neuron) Activate(neuron_inputs []float64) float64 {
 	for i := 0; i < n.num_inputs; i++ {
 		n.weighted_input += neuron_inputs[i] * n.weights[i]
 	}
-	// Using the inverse tangent as a sigmoid function
+	// Using the hyperbolic tangent as a sigmoid activation function
 	return math.Tanh(n.weighted_input)
 }

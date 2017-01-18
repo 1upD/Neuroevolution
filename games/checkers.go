@@ -29,26 +29,22 @@ import (
 //7	|	 1	 0	 1	 0	 1	 0	 1	 0
 //		 -	 -	 - 	 -
 //		 0	 1	 2	 3	4	5	6	7
+
+// Runs a game of checkers between the two given players. The first player has the
+// dark colored pieces and will start first.
 //
-//
-// Possible moves
-// y % 2 != 0 && x==0
-// y + 1
-// else y== 7
-// y -1, y-1 x-1
-//
-// y % 2 == 0 && x==3
-// y - 1
-// else y == 6
-// y -1, y-1 x+1
+// To play Checkers with a turn limit for evolutionary algorithms, use MakeCheckers
+// to produce a variant of checkers with the desired turn limit.
 func Checkers(black_player Player, red_player Player) int {
 	return MakeCheckers(0)(black_player, red_player)
 }
 
-// Factory function returns a variant of checkers given a turn limit
+// Factory function returns a variant of checkers given a turn limit.
+// If the given turn limit is less than one, there will be no turn limit.
 func MakeCheckers(turn_limit int) Game {
 	return func(black_player Player, red_player Player) int {
-		// There are four functional columns with 8 rows.
+		// There are 8 columns with 8 rows. Every other space is left empty but
+		// using an 8x8 array simplifies the logic.
 		// I used columns first for easier indexing.
 		game_state := [8][8]int{
 			[8]int{0, -1, 0, 0, 0, 1, 0, 1},
@@ -69,6 +65,9 @@ func MakeCheckers(turn_limit int) Game {
 		// a coordinate pair of the piece to be moved and the second two represent the
 		// space to move to.
 		var moves []interface{}
+
+		// move_score temporarily stores the returned value of a move, while
+		// player_move temporarily stores the move
 		var move_score int
 		var player_move [4]int
 
@@ -105,8 +104,10 @@ func MakeCheckers(turn_limit int) Game {
 
 		if black_score > red_score {
 			return 1
-		} else {
+		} else if red_score > black_score {
 			return -1
+		} else {
+			return 0
 		}
 	}
 }
@@ -226,7 +227,6 @@ func checkers_make_move(game_state [8][8]int, move [4]int) ([8][8]int, int) {
 
 	game_state[move[0]][move[1]] = 0
 
-	// TODO Complete this section
 	// Check if this move is a capture and remove opposing pieces
 	// If the difference in Y is 2, this move is a capture
 	//	fmt.Println("\nIs this a capture? ", (move[3]-move[1])*(move[3]-move[1]))
