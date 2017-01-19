@@ -12,7 +12,7 @@ import (
 //(which must all be the same type!) run an evolutionary algorithm and return
 // the best agent.
 func EvolveAgents(g games.Game, playerMaker games.PlayerMaker, generations int,
-	max_games int, pop []games.Agent) games.Agent {
+	max_games int, max_streak int, pop []games.Agent) games.Agent {
 
 	// Initialize an array of channels for each member of the population
 	fitness_channels := make([]chan int, len(pop))
@@ -37,7 +37,7 @@ func EvolveAgents(g games.Game, playerMaker games.PlayerMaker, generations int,
 	i := 0
 	for {
 		// Start a goroutine to test each member of the population.
-		for j := 0; j < len(pop); j++ { // TODO Why is this minus one!?
+		for j := 0; j < len(pop); j++ {
 			index := j
 			go func() {
 				// TODO Running the trials until a loss is unreliable because
@@ -63,7 +63,12 @@ func EvolveAgents(g games.Game, playerMaker games.PlayerMaker, generations int,
 						score += 1
 					// Reward draws too.
 					case 0:
-						score += 1
+						score += 0 // After the code review, I changed the reward
+						// for draws to 0. In Tic Tac Toe this produces better
+						// results because a perfect player should win against
+						// a random player. This does make it nearly impossible
+						// to reach the maximum number of wins because some games
+						// will always be draws
 					// If they lose, break out of the loop.
 					case -1:
 						k = max_games
@@ -89,7 +94,12 @@ func EvolveAgents(g games.Game, playerMaker games.PlayerMaker, generations int,
 			}
 		}
 
-		if max_fitness == max_games {
+		if fitness_values[0] == max_games { // This used to check the maximum value
+			// but I changed it to instead look at the inherited value. A better measure
+			// of convergence of the population is whether the inherited network reached
+			// the maximum number of wins because the games are random
+			// TODO If the fitness function becomes less random, consider replacing this
+			// check with the maximum value again
 			streak += 1
 		} else {
 			streak = 0
@@ -102,7 +112,7 @@ func EvolveAgents(g games.Game, playerMaker games.PlayerMaker, generations int,
 
 		// Iterate the generation number and return if the algorithm is complete.
 		i++
-		if i >= generations || streak >= 10 {
+		if i >= generations || streak >= max_streak {
 			return max_agent
 		}
 

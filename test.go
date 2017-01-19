@@ -24,7 +24,7 @@ func testXOR() {
 	}
 
 	evolution.EvolveAgents(games.XorGame, games.XorGamePlayerMaker,
-		2000, 256, pop)
+		2000, 256, 10, pop)
 
 }
 
@@ -43,7 +43,7 @@ func testTicTacToe() {
 
 	// Evolve an agent capable of playing
 	evolved_agent := evolution.EvolveAgents(games.TicTacToe, games.TicTacToePlayerMaker,
-		10000, 1024, pop)
+		100, 128, 10, pop)
 
 	fmt.Println("Training complete!")
 
@@ -77,8 +77,8 @@ func testCheckers() {
 	// Run neuroevolution to produce an agent. The checkers games used by the
 	// evolutionary algorithm will be cut off after 100 moves to prevent
 	// random players from prolonging the game indefinitely.
-	evolved_agent := evolution.EvolveAgents(games.MakeCheckers(100), games.CheckersPlayerMaker,
-		512, 64, pop) // Each member of the population will be tested at maximum 64 times.
+	evolved_agent := evolution.EvolveAgents(games.MakeCheckers(256), games.CheckersPlayerMaker,
+		256, 128, 32, pop) // Each member of the population will be tested at maximum 64 times.
 	// After 512 generations the algorithm concludes if it hasn't already spawned
 	// an agent that can win 64 times for 10 generations.
 	fmt.Println("Training complete!")
