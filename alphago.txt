@@ -1,0 +1,7 @@
+My interest in researching a game playing algorithm was sparked by the recent success of AlphaGo, a system built by Google to play Go. (the board game, not the language) I knew that Go used a combination of two deep neural networks and search methods, but I didn't do any formal research on AlphaGo for this class.
+
+After my code walkthrough with Professor VanderLinden, I decided to take another look at AlphaGo and see if I could find out more information about how it defeated Lee Sodol. Thankfully, a Google blog post sheds some light on the algorithm AlphaGo uses.
+
+Google describes the two networks that make up AlphaGo as a "policy" network and a "value" network. The value network is used as a heuristic to evaluate a board position while the policy network is used to select most likely moves to prune the search tree. 
+
+https://research.googleblog.com/2016/01/alphago-mastering-ancient-game-of-go.html
