@@ -4,4 +4,10 @@ After my code walkthrough with Professor VanderLinden, I decided to take another
 
 Google describes the two networks that make up AlphaGo as a "policy" network and a "value" network. The value network is used as a heuristic to evaluate a board position while the policy network is used to select most likely moves to prune the search tree. 
 
+The policy network was trained using supervised learning techniques on a dataset of 30 million moves by professional Go players. 57% of the time the network would accurately predict human player's moves. Then, the networks were improved using reinforcement learning. According to the article, the policy network playing without any additional search algorithms can defeat state of the art Go playing AIs.
+
+The value network was trained with the policy network to predict eventual wins or losses based on any game state. The article doesn't go into details about how this was done, but presumably reinforcement learning techniques were employed with the policy network playing against itself and the value network attempting to predict which side would win based on each board configuration.
+
+My project is similar to the first step of training AlphaGo; training a policy network. Using evolution to train networks for both policy networks (as I have implemented) and value networks could be used to produce agents similar to AlphaGo. However, since this project was meant to be run on personal computers I have only implemented networks with one hidden layer, which is very limiting. Additionally, the search depth of such an agent would have to be reduced to contend with the limited resources of PC processors. If one could take advantage of GPUs with Golang, using Golang for this application would deliver much higher performance.
+
 https://research.googleblog.com/2016/01/alphago-mastering-ancient-game-of-go.html
