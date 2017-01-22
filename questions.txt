@@ -1,0 +1,5 @@
+1. Should a fitness function for a neuroevolutionary algorithm continue until the agent fails to defeat a random player, or should a set number of trials play out and the fitness be evaluated as a percentage? The former involves many less trials and runs faster, but due to the randomness of the trials the latter may be unreliable.
+
+2. Used in isolation from each other, do policy networks or value networks produce better players?
+
+3. Can an evolved value network beat a heuristic function in search based players?
