@@ -100,7 +100,7 @@ func testTicTacToe() {
 // Run Checkers games against the user indefinitely once the evolved agent is ready.
 func testCheckers() {
 	// Seed the initial population
-	pop_size := 256
+	pop_size := 100
 	pop := make([]classifiers.Classifier, pop_size)
 	for i := 0; i < pop_size; i++ {
 		pop[i] = classifiers.RandomNetwork(65, 130, 24)
@@ -109,8 +109,8 @@ func testCheckers() {
 	// Run neuroevolution to produce an agent. The checkers games used by the
 	// evolutionary algorithm will be cut off after 100 moves to prevent
 	// random players from prolonging the game indefinitely.
-	evolved_agent := evolution.EvolveAgents(games.MakeCheckers(256), games.CheckersPlayerMaker,
-		256, 256, 10, pop) // Each member of the population will be tested at maximum 128 times.
+	evolved_agent := evolution.EvolveAgents(games.MakeCheckers(128), games.CheckersPlayerMaker,
+		128, 64, 10, pop) // Each member of the population will be tested at maximum 128 times.
 	// After 256 generations the algorithm concludes if it hasn't already spawned
 	// an agent that can win 128 times for 4 generations.
 	fmt.Println("Training complete!")
