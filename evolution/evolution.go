@@ -16,19 +16,19 @@ func EvolveAgents(g games.Game, playerMaker games.PlayerMaker, generations int,
 	max_games int, max_streak int, pop []classifiers.Classifier) classifiers.Classifier {
 
 	// Initialize an array of channels for each member of the population
-	fitness_channels := make([]chan int, len(pop))
-	fitness_values := make([]int, len(pop))
+	fitness_channels := make([]chan float64, len(pop))
+	fitness_values := make([]float64, len(pop))
 
 	// Initialize an array for the new population
 	var new_pop []classifiers.Classifier
 
 	// Initialize variables for max fitness and max agent
-	max_fitness := -9999999999
+	max_fitness := -9999999999.0
 	var max_agent classifiers.Classifier
 
 	//Initialize each channel
 	for i := 0; i < len(pop); i++ {
-		fitness_channels[i] = make(chan int)
+		fitness_channels[i] = make(chan float64)
 	}
 
 	streak := 0
@@ -52,7 +52,7 @@ func EvolveAgents(g games.Game, playerMaker games.PlayerMaker, generations int,
 				// continue running it until there is a loss? Then use the percentage
 				// as the fitness score.
 
-				score := 0
+				score := 0.0
 				player := playerMaker(pop[index])
 				// Keep testing this player until the maximum number of games is
 				// reached.
@@ -61,10 +61,10 @@ func EvolveAgents(g games.Game, playerMaker games.PlayerMaker, generations int,
 					switch games.PlayerTrial(g, player) {
 					// If the agent player wins, reward it
 					case 1:
-						score += 1
+						score += 1.0
 					// Reward draws too.
 					case 0:
-						score += 0 // After the code review, I changed the reward
+						score += 0.0 // After the code review, I changed the reward
 						// for draws to 0. In Tic Tac Toe this produces better
 						// results because a perfect player should win against
 						// a random player. This does make it nearly impossible
@@ -81,13 +81,13 @@ func EvolveAgents(g games.Game, playerMaker games.PlayerMaker, generations int,
 
 				// Send the score over the appropriate channel
 				//				fmt.Println("Preparing to send fitness ", index)
-				fitness_channels[index] <- score
+				fitness_channels[index] <- (score / float64(max_games)) * 100.0 // Score fitness as a percentage - 100 is max, 50 is expected, 0 is min
 				//				fmt.Println("Sent fitness ", index)
 			}()
 		}
 
 		// Receive fitness values from channels and find the maximum fitness
-		max_fitness = -9999999
+		max_fitness = -9999999.0
 		for j := 0; j < len(pop); j++ { // TODO Why was this -1?
 			//			fmt.Println("Preparing to receive fitness ", j)
 			fitness_values[j] = <-fitness_channels[j]
@@ -98,7 +98,7 @@ func EvolveAgents(g games.Game, playerMaker games.PlayerMaker, generations int,
 			}
 		}
 
-		if fitness_values[0] == max_games { // This used to check the maximum value
+		if fitness_values[0] == 100.0 { // This used to check the maximum value
 			// but I changed it to instead look at the inherited value. A better measure
 			// of convergence of the population is whether the inherited network reached
 			// the maximum number of wins because the games are random
@@ -136,14 +136,14 @@ func EvolveAgents(g games.Game, playerMaker games.PlayerMaker, generations int,
 
 }
 
-func weighted_selection(items []classifiers.Classifier, weights []int) classifiers.Classifier {
-	total := 0
+func weighted_selection(items []classifiers.Classifier, weights []float64) classifiers.Classifier {
+	total := 0.0
 	for i := 0; i < len(weights); i++ {
 		total += weights[i]
 	}
 
-	r := rand.Intn(total)
-	upto := 0
+	r := rand.Float64() * total
+	upto := 0.0
 
 	for i := 0; i < len(items); i++ {
 		w := weights[i]
