@@ -1,11 +1,9 @@
-package neuralnetwork
+package classifiers
 
 import (
 	"encoding/json"
 	"math/rand"
 	"os"
-
-	"github.com/CRRDerek/Neuroevolution/games"
 )
 
 // NeuralNetwork provides a Neural Network type.
@@ -26,11 +24,11 @@ type neuralNetwork struct {
 	Layer_output []*neuron
 }
 
-// Predict() feeds a given input array into the network and activates the neurons.
+// Classify() feeds a given input array into the network and activates the neurons.
 // It returns the output of the network as an array of floats.
 // The input array must match the input size of the network.
 // The output array will match the output size of the network.
-func (net neuralNetwork) Predict(inputs []float64) []float64 {
+func (net neuralNetwork) Classify(inputs []float64) []float64 {
 	// Launch a goroutine for each hidden neuron to calculate the output.
 	for i := 0; i < net.Num_hiddens; i++ { // TODO Why is this minus one!?
 		index := i
@@ -73,7 +71,7 @@ func (net neuralNetwork) Predict(inputs []float64) []float64 {
 // Generate a single hidden layer neural network with randomly assigned weights.
 // This will be used at the beginning of an evolutionary algorithm to randomly
 // seed the population.
-func RandomNetwork(num_inputs, Num_hiddens, Num_outputs int) games.Agent {
+func RandomNetwork(num_inputs, Num_hiddens, Num_outputs int) Classifier {
 	n := new(neuralNetwork)
 	n.Num_inputs = num_inputs
 	n.Num_hiddens = Num_hiddens
@@ -103,11 +101,11 @@ func RandomNetwork(num_inputs, Num_hiddens, Num_outputs int) games.Agent {
 	return n
 }
 
-// Implements the Agent interface. Used by evolutionary algorithms to mate two
+// Implements the Classifier interface. Used by evolutionary algorithms to mate two
 // networks together.
 //
 // Other must also be this type of neural network for this to work!
-func (n neuralNetwork) Mate(other games.Agent) games.Agent {
+func (n neuralNetwork) Mate(other Classifier) Classifier {
 	o := other.(*neuralNetwork)
 	return mate(&n, o)
 }

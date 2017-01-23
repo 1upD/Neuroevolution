@@ -6,6 +6,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/CRRDerek/Neuroevolution/classifiers"
 )
 
 //Checkers
@@ -278,7 +280,7 @@ func checkers_make_move(game_state [8][8]int, move [4]int) ([8][8]int, int) {
 //
 // The player's move is chosen by examining each valid move, summing up the
 // predictions on that moves coordinates, and choosing the maximum summed prediction.
-func CheckersPlayerMaker(a Agent) Player {
+func CheckersPlayerMaker(a classifiers.Classifier) Player {
 	return func(game_state interface{}, moves []interface{}) interface{} {
 		// Activation input - always on
 		inputs := []float64{1.0}
@@ -327,7 +329,7 @@ func CheckersPlayerMaker(a Agent) Player {
 
 		}
 
-		prediction := a.Predict(inputs)
+		prediction := a.Classify(inputs)
 
 		max_choice := moves[0]
 		max_val := -999.0

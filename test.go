@@ -3,25 +3,25 @@ package main
 import (
 	"fmt"
 
+	"github.com/CRRDerek/Neuroevolution/classifiers"
 	"github.com/CRRDerek/Neuroevolution/evolution"
 	"github.com/CRRDerek/Neuroevolution/games"
-	"github.com/CRRDerek/Neuroevolution/neuralnetwork"
 )
 
 func main() {
-	testSaveJSON()
+	//testSaveJSON()
 	//testXOR()
 	//testTicTacToe()
-	//testCheckers()
+	testCheckers()
 }
 
 // Seed a population of networks capable of learning XOR and then run neuroevolution
 // on the XOR game.
 func testXOR() {
 	// Seed the initial population
-	pop := make([]games.Agent, 100)
+	pop := make([]classifiers.Classifier, 100)
 	for i := 0; i < 100; i++ {
-		pop[i] = neuralnetwork.RandomNetwork(3, 4, 1)
+		pop[i] = classifiers.RandomNetwork(3, 4, 1)
 	}
 
 	evolution.EvolveAgents(games.XorGame, games.XorGamePlayerMaker,
@@ -30,18 +30,7 @@ func testXOR() {
 }
 
 func testSaveJSON() {
-	// Run the Tic Tac Toe evolution except faster
-	// Seed the initial population
-	//	pop_size := 100
-	//	pop := make([]games.Agent, pop_size)
-	//	for i := 0; i < pop_size; i++ {
-	//		pop[i] = neuralnetwork.RandomNetwork(28, 56, 9)
-	//	}
-
-	//	// Evolve an agent capable of playing
-	//	evolved_agent := evolution.EvolveAgents(games.TicTacToe, games.TicTacToePlayerMaker,
-	//		100, 128, 5, pop)
-	evolved_agent := neuralnetwork.RandomNetwork(28, 56, 9)
+	evolved_agent := classifiers.RandomNetwork(28, 56, 9)
 
 	fmt.Println("Training complete!")
 	fmt.Println("Saving to file...")
@@ -52,7 +41,7 @@ func testSaveJSON() {
 
 	fmt.Println("Loading from file...")
 	// Load agent
-	loaded_agent, err := neuralnetwork.LoadJSON("data/testSave.json")
+	loaded_agent, err := classifiers.LoadJSON("data/testSave.json")
 	if err != nil {
 		fmt.Println("Error saving agent: ", err)
 	}
@@ -79,9 +68,9 @@ func testSaveJSON() {
 func testTicTacToe() {
 	// Seed the initial population
 	pop_size := 256
-	pop := make([]games.Agent, pop_size)
+	pop := make([]classifiers.Classifier, pop_size)
 	for i := 0; i < pop_size; i++ {
-		pop[i] = neuralnetwork.RandomNetwork(28, 56, 9)
+		pop[i] = classifiers.RandomNetwork(28, 56, 9)
 	}
 
 	// Evolve an agent capable of playing
@@ -111,20 +100,27 @@ func testTicTacToe() {
 // Run Checkers games against the user indefinitely once the evolved agent is ready.
 func testCheckers() {
 	// Seed the initial population
-	pop_size := 100
-	pop := make([]games.Agent, pop_size)
+	pop_size := 256
+	pop := make([]classifiers.Classifier, pop_size)
 	for i := 0; i < pop_size; i++ {
-		pop[i] = neuralnetwork.RandomNetwork(65, 130, 24)
+		pop[i] = classifiers.RandomNetwork(65, 130, 24)
 	}
 
 	// Run neuroevolution to produce an agent. The checkers games used by the
 	// evolutionary algorithm will be cut off after 100 moves to prevent
 	// random players from prolonging the game indefinitely.
 	evolved_agent := evolution.EvolveAgents(games.MakeCheckers(256), games.CheckersPlayerMaker,
-		2048, 128, 10, pop) // Each member of the population will be tested at maximum 128 times.
+		256, 256, 10, pop) // Each member of the population will be tested at maximum 128 times.
 	// After 256 generations the algorithm concludes if it hasn't already spawned
 	// an agent that can win 128 times for 4 generations.
 	fmt.Println("Training complete!")
+
+	filename := "data/Checkers.json"
+	err := evolved_agent.SaveJSON(filename)
+	if err != nil {
+		fmt.Println("Error saving agent: ", err)
+	}
+	fmt.Println("Saved to file: ", filename)
 
 	// Play checkers against the user indefinitely
 	for {

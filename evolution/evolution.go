@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 
+	"github.com/CRRDerek/Neuroevolution/classifiers"
 	"github.com/CRRDerek/Neuroevolution/games"
 )
 
@@ -12,18 +13,18 @@ import (
 //(which must all be the same type!) run an evolutionary algorithm and return
 // the best agent.
 func EvolveAgents(g games.Game, playerMaker games.PlayerMaker, generations int,
-	max_games int, max_streak int, pop []games.Agent) games.Agent {
+	max_games int, max_streak int, pop []classifiers.Classifier) classifiers.Classifier {
 
 	// Initialize an array of channels for each member of the population
 	fitness_channels := make([]chan int, len(pop))
 	fitness_values := make([]int, len(pop))
 
 	// Initialize an array for the new population
-	var new_pop []games.Agent
+	var new_pop []classifiers.Classifier
 
 	// Initialize variables for max fitness and max agent
 	max_fitness := -9999999999
-	var max_agent games.Agent
+	var max_agent classifiers.Classifier
 
 	//Initialize each channel
 	for i := 0; i < len(pop); i++ {
@@ -117,14 +118,14 @@ func EvolveAgents(g games.Game, playerMaker games.PlayerMaker, generations int,
 		}
 
 		// Create a new array for the new population
-		new_pop = make([]games.Agent, len(pop))
+		new_pop = make([]classifiers.Classifier, len(pop))
 		new_pop[0] = max_agent
 
 		// Create the next generation by mating based on fitness
 		for j := 1; j < len(pop); j++ {
 			p1 := weighted_selection(pop, fitness_values)
 			p2 := weighted_selection(pop, fitness_values)
-			new_pop[j] = p1.(games.Agent).Mate(p2.(games.Agent))
+			new_pop[j] = p1.(classifiers.Classifier).Mate(p2.(classifiers.Classifier))
 		}
 
 		pop = new_pop
@@ -132,7 +133,7 @@ func EvolveAgents(g games.Game, playerMaker games.PlayerMaker, generations int,
 
 }
 
-func weighted_selection(items []games.Agent, weights []int) games.Agent {
+func weighted_selection(items []classifiers.Classifier, weights []int) classifiers.Classifier {
 	total := 0
 	for i := 0; i < len(weights); i++ {
 		total += weights[i]

@@ -1,4 +1,4 @@
-package neuralnetwork
+package classifiers
 
 import (
 	"math"

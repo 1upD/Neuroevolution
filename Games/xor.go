@@ -2,6 +2,8 @@ package games
 
 import (
 	"math/rand"
+
+	"github.com/CRRDerek/Neuroevolution/classifiers"
 )
 
 // Because even Tic Tac Toe was too complicated for my earliest tests, I've come
@@ -56,14 +58,14 @@ func XorGame(p1 Player, p2 Player) int {
 	return 0
 }
 
-func XorGamePlayerMaker(a Agent) Player {
+func XorGamePlayerMaker(a classifiers.Classifier) Player {
 	return func(game_state interface{}, moves []interface{}) interface{} {
 		inputs := []float64{1.0}
 
 		inputs = append(inputs, game_state.([]float64)[0])
 		inputs = append(inputs, game_state.([]float64)[1])
 
-		prediction := a.Predict(inputs)
+		prediction := a.Classify(inputs)
 		if prediction[0] > 0.5 {
 			return 1
 		} else {

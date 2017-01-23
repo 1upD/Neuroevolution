@@ -2,6 +2,8 @@ package games
 
 import (
 	"math/rand"
+
+	"github.com/CRRDerek/Neuroevolution/classifiers"
 )
 
 // Player is a type of function that given a game state and a list of valid moves
@@ -11,7 +13,7 @@ type Player func(game_state interface{}, moves []interface{}) interface{}
 
 // Each game should have a separate factory function to create an player based
 // on an agent and that particular game's configuration.
-type PlayerMaker func(a Agent) Player
+type PlayerMaker func(a classifiers.Classifier) Player
 
 // Every two player game must have a function to play the game given two appropriate
 // player objects.
