@@ -1,0 +1,3 @@
+This was a trial of Tic Tac Toe I did using my new fitness function. Disturbingly, it did not converge on 100% success.
+
+I ran it with a popultion of 256, 100 generations and 128 trials per generation.

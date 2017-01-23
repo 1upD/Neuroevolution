@@ -11,8 +11,8 @@ import (
 func main() {
 	//testSaveJSON()
 	//testXOR()
-	//testTicTacToe()
-	testCheckers()
+	testTicTacToe()
+	//testCheckers()
 }
 
 // Seed a population of networks capable of learning XOR and then run neuroevolution
@@ -79,6 +79,8 @@ func testTicTacToe() {
 
 	fmt.Println("Training complete!")
 
+	save(evolved_agent, "data/TicTacToe.json")
+
 	// Play tic tac toe against the user
 	for {
 		victor := games.TicTacToe(games.TicTacToePlayerMaker(evolved_agent), games.HumanTicTacToePlayer)
@@ -115,12 +117,7 @@ func testCheckers() {
 	// an agent that can win 128 times for 4 generations.
 	fmt.Println("Training complete!")
 
-	filename := "data/Checkers.json"
-	err := evolved_agent.SaveJSON(filename)
-	if err != nil {
-		fmt.Println("Error saving agent: ", err)
-	}
-	fmt.Println("Saved to file: ", filename)
+	save(evolved_agent, "data/Checkers.json")
 
 	// Play checkers against the user indefinitely
 	for {
@@ -148,4 +145,12 @@ func testRandomCheckers() {
 			fmt.Println("\n\nYou lose!")
 		}
 	}
+}
+
+func save(c classifiers.Classifier, filename string) {
+	err := c.SaveJSON(filename)
+	if err != nil {
+		fmt.Println("Error saving agent: ", err)
+	}
+	fmt.Println("Saved to file: ", filename)
 }
