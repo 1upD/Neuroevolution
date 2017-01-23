@@ -52,36 +52,43 @@ func EvolveAgents(g games.Game, playerMaker games.PlayerMaker, generations int,
 				// continue running it until there is a loss? Then use the percentage
 				// as the fitness score.
 
-				score := 0.0
+				scoreChan := make(chan int)
+				counterChan := make(chan int)
+				breakChan := make(chan int)
 				player := playerMaker(pop[index])
 				// Keep testing this player until the maximum number of games is
 				// reached.
 				for k := 0; k < max_games; k++ {
-					// Play the game against a random opponent
-					switch games.PlayerTrial(g, player) {
-					// If the agent player wins, reward it
-					case 1:
-						score += 1.0
-					// Reward draws too.
-					case 0:
-						score += 0.0 // After the code review, I changed the reward
-						// for draws to 0. In Tic Tac Toe this produces better
-						// results because a perfect player should win against
-						// a random player. This does make it nearly impossible
-						// to reach the maximum number of wins because some games
-						// will always be draws
-					// If they lose, break out of the loop.
-					case -1:
-						// k = max_games
-						// I commented out the code that stops the trials after
-						// a failure. This will take a lot longer but should counteract
-						// some of the randomness of my earlier method.
-					}
+					go func() {
+						win := 0
+						// Play the game against a random opponent
+						if games.PlayerTrial(g, player) == 1 {
+							win = 1
+
+						}
+						score := <-scoreChan
+						scoreChan <- score + win
+						counter := <-counterChan
+						if counter == max_games-2 {
+							breakChan <- 1
+						} else {
+							counterChan <- counter + 1
+
+						}
+
+					}()
 				}
+
+				scoreChan <- 0
+				counterChan <- 0
+
+				<-breakChan
+
+				score := <-scoreChan
 
 				// Send the score over the appropriate channel
 				//				fmt.Println("Preparing to send fitness ", index)
-				fitness_channels[index] <- (score / float64(max_games)) * 100.0 // Score fitness as a percentage - 100 is max, 50 is expected, 0 is min
+				fitness_channels[index] <- (float64(score) / float64(max_games)) * 100.0 // Score fitness as a percentage - 100 is max, 50 is expected, 0 is min
 				//				fmt.Println("Sent fitness ", index)
 			}()
 		}
