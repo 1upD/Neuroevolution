@@ -72,7 +72,10 @@ func EvolveAgents(g games.Game, playerMaker games.PlayerMaker, generations int,
 						// will always be draws
 					// If they lose, break out of the loop.
 					case -1:
-						k = max_games
+						// k = max_games
+						// I commented out the code that stops the trials after
+						// a failure. This will take a lot longer but should counteract
+						// some of the randomness of my earlier method.
 					}
 				}
 
