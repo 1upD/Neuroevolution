@@ -1,7 +1,9 @@
 package neuralnetwork
 
 import (
+	"encoding/json"
 	"math/rand"
+	"os"
 
 	"github.com/CRRDerek/Neuroevolution/games"
 )
@@ -173,4 +175,32 @@ func mate(p1 *neuralNetwork, p2 *neuralNetwork) *neuralNetwork {
 
 	return n
 
+}
+
+// Encodes this network as a JSON file.
+func (n *neuralNetwork) SaveJSON(filepath string) error {
+	fi, err := os.Open(filepath)
+	if err != nil {
+		fi, err = os.Create(filepath)
+		if err != nil {
+			return err
+		}
+	}
+	enc := json.NewEncoder(fi)
+
+	return enc.Encode(n)
+}
+
+// Decodes a new network from a JSON file
+func LoadJSON(filepath string) (*neuralNetwork, error) {
+	fi, err := os.Open(filepath)
+	if err != nil {
+		return nil, err
+	}
+	enc := json.NewDecoder(fi)
+
+	n := neuralNetwork{}
+
+	err = enc.Decode(&n)
+	return &n, err
 }

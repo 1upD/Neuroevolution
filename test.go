@@ -9,9 +9,10 @@ import (
 )
 
 func main() {
+	testSaveJSON()
 	//testXOR()
 	//testTicTacToe()
-	testCheckers()
+	//testCheckers()
 }
 
 // Seed a population of networks capable of learning XOR and then run neuroevolution
@@ -25,6 +26,48 @@ func testXOR() {
 
 	evolution.EvolveAgents(games.XorGame, games.XorGamePlayerMaker,
 		2000, 256, 10, pop)
+
+}
+
+func testSaveJSON() {
+	// Run the Tic Tac Toe evolution except faster
+	// Seed the initial population
+	//	pop_size := 100
+	//	pop := make([]games.Agent, pop_size)
+	//	for i := 0; i < pop_size; i++ {
+	//		pop[i] = neuralnetwork.RandomNetwork(28, 56, 9)
+	//	}
+
+	//	// Evolve an agent capable of playing
+	//	evolved_agent := evolution.EvolveAgents(games.TicTacToe, games.TicTacToePlayerMaker,
+	//		100, 128, 5, pop)
+	evolved_agent := neuralnetwork.RandomNetwork(28, 56, 9)
+
+	fmt.Println("Training complete!")
+	fmt.Println("Saving to file...")
+	err := evolved_agent.SaveJSON("data/testSave.json")
+	if err != nil {
+		fmt.Println("Error saving agent: ", err)
+	}
+
+	fmt.Println("Loading from file...")
+	// Load agent
+	loaded_agent, err := neuralnetwork.LoadJSON("data/testSave.json")
+	if err != nil {
+		fmt.Println("Error saving agent: ", err)
+	}
+
+	// Play tic tac toe against the user
+	for {
+		victor := games.TicTacToe(games.TicTacToePlayerMaker(loaded_agent), games.HumanTicTacToePlayer)
+		if victor == -1 {
+			fmt.Println("\n\nYou win!")
+		} else if victor == 0 {
+			fmt.Println("\n\nDraw!")
+		} else if victor == 1 {
+			fmt.Println("\n\nYou lose!")
+		}
+	}
 
 }
 
@@ -78,7 +121,7 @@ func testCheckers() {
 	// evolutionary algorithm will be cut off after 100 moves to prevent
 	// random players from prolonging the game indefinitely.
 	evolved_agent := evolution.EvolveAgents(games.MakeCheckers(256), games.CheckersPlayerMaker,
-		256, 128, 4, pop) // Each member of the population will be tested at maximum 128 times.
+		2048, 128, 10, pop) // Each member of the population will be tested at maximum 128 times.
 	// After 256 generations the algorithm concludes if it hasn't already spawned
 	// an agent that can win 128 times for 4 generations.
 	fmt.Println("Training complete!")

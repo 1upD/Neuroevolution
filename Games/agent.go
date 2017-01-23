@@ -12,4 +12,7 @@ type Agent interface {
 
 	Mate(other Agent) Agent // All agents must be able to mate with other agents
 	// of the same type for the evolutionary algorithm
+
+	// Agents must be able to save some sort of learned data to JSON
+	SaveJSON(filepath string) error
 }
