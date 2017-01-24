@@ -1,0 +1,1 @@
+I ran this one for 512 generations with 256 maximum games and a population size of 256. It failed to converge, with extremely high scores near the end. I think I can safely revert to the earlier method of evaluating networks.

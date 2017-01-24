@@ -25,7 +25,7 @@ func testXOR() {
 	}
 
 	evolution.EvolveAgents(games.XorGame, games.XorGamePlayerMaker,
-		2000, 256, 10, pop)
+		2000, 256, 10, pop, evolution.Elimination_fitness)
 
 }
 
@@ -75,9 +75,11 @@ func testTicTacToe() {
 
 	// Evolve an agent capable of playing
 	evolved_agent := evolution.EvolveAgents(games.TicTacToe, games.TicTacToePlayerMaker,
-		100, 128, 10, pop)
+		512, 256, 4, pop, evolution.Elimination_fitness)
 
 	fmt.Println("Training complete!")
+
+	save(evolved_agent, "data/TicTacToe.json")
 
 	// Play tic tac toe against the user
 	for {
@@ -100,7 +102,7 @@ func testTicTacToe() {
 // Run Checkers games against the user indefinitely once the evolved agent is ready.
 func testCheckers() {
 	// Seed the initial population
-	pop_size := 256
+	pop_size := 50
 	pop := make([]classifiers.Classifier, pop_size)
 	for i := 0; i < pop_size; i++ {
 		pop[i] = classifiers.RandomNetwork(65, 130, 24)
@@ -109,18 +111,13 @@ func testCheckers() {
 	// Run neuroevolution to produce an agent. The checkers games used by the
 	// evolutionary algorithm will be cut off after 100 moves to prevent
 	// random players from prolonging the game indefinitely.
-	evolved_agent := evolution.EvolveAgents(games.MakeCheckers(256), games.CheckersPlayerMaker,
-		256, 256, 10, pop) // Each member of the population will be tested at maximum 128 times.
+	evolved_agent := evolution.EvolveAgents(games.MakeCheckers(32), games.CheckersPlayerMaker,
+		100, 128, 4, pop, evolution.Elimination_fitness) // Each member of the population will be tested at maximum 128 times.
 	// After 256 generations the algorithm concludes if it hasn't already spawned
 	// an agent that can win 128 times for 4 generations.
 	fmt.Println("Training complete!")
 
-	filename := "data/Checkers.json"
-	err := evolved_agent.SaveJSON(filename)
-	if err != nil {
-		fmt.Println("Error saving agent: ", err)
-	}
-	fmt.Println("Saved to file: ", filename)
+	save(evolved_agent, "data/Checkers.json")
 
 	// Play checkers against the user indefinitely
 	for {
@@ -148,4 +145,12 @@ func testRandomCheckers() {
 			fmt.Println("\n\nYou lose!")
 		}
 	}
+}
+
+func save(c classifiers.Classifier, filename string) {
+	err := c.SaveJSON(filename)
+	if err != nil {
+		fmt.Println("Error saving agent: ", err)
+	}
+	fmt.Println("Saved to file: ", filename)
 }

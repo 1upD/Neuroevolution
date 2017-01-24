@@ -1,0 +1,1 @@
+This network was trained using a percentage based fitness function with a population size of 50 for 100 generations with a 32 move Checkers game and 128 games per trial. The last generation did have a fitness value of 100% however I think this was more luck than genuine convergence.

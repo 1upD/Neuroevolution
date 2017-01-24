@@ -1,0 +1,5 @@
+This network was a test of a new fitness function that runs the maximum number of trials for each member of the population and returns the percentage wins as a fitness value.
+
+The evolutionary algorithm was run on a checkers game that ends after 32 moves, with a population size of 50, 100 generations, 128 games played per trial, and a 4 maximum streak to return.
+
+The network failed to converge on 100%.
