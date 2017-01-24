@@ -78,7 +78,7 @@ func testCheckers() {
 	// evolutionary algorithm will be cut off after 100 moves to prevent
 	// random players from prolonging the game indefinitely.
 	evolved_agent := evolution.EvolveAgents(games.MakeCheckers(256), games.CheckersPlayerMaker,
-		256, 128, 4, pop) // Each member of the population will be tested at maximum 128 times.
+		2048, 256, 16, pop) // Each member of the population will be tested at maximum 128 times.
 	// After 256 generations the algorithm concludes if it hasn't already spawned
 	// an agent that can win 128 times for 4 generations.
 	fmt.Println("Training complete!")
