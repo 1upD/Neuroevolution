@@ -8,6 +8,8 @@ import (
 	"github.com/CRRDerek/Neuroevolution/games"
 )
 
+type fitnessFunc func(g games.Game, player games.Player, max_games int, fitnessChan *chan int)
+
 // Given a game, a player factory function, (specific to that game) the number of
 // generations, maximum number of games, and an initial population of agents
 //(which must all be the same type!) run an evolutionary algorithm and return
@@ -40,47 +42,7 @@ func EvolveAgents(g games.Game, playerMaker games.PlayerMaker, generations int,
 		// Start a goroutine to test each member of the population.
 		for j := 0; j < len(pop); j++ {
 			index := j
-			go func() {
-				// TODO Running the trials until a loss is unreliable because
-				// of the randomness in the game. Consider instead running a fixed
-				// number of trials and computing fitness as a percentage of those
-				// trials. Agents have an expected fitness of 50%, treat them accordingly.
-				// The only problem with running the maximum number of trials is that
-				// it slows the algorithm down substantially; stopping after the first
-				// loss quickly prunes the population. Perhaps I should instead
-				// run a small number of trials, say 10, and if it reaches the maximum
-				// continue running it until there is a loss? Then use the percentage
-				// as the fitness score.
-
-				score := 0
-				player := playerMaker(pop[index])
-				// Keep testing this player until the maximum number of games is
-				// reached.
-				for k := 0; k < max_games; k++ {
-					// Play the game against a random opponent
-					switch games.PlayerTrial(g, player) {
-					// If the agent player wins, reward it
-					case 1:
-						score += 1
-					// Reward draws too.
-					case 0:
-						score += 0 // After the code review, I changed the reward
-						// for draws to 0. In Tic Tac Toe this produces better
-						// results because a perfect player should win against
-						// a random player. This does make it nearly impossible
-						// to reach the maximum number of wins because some games
-						// will always be draws
-					// If they lose, break out of the loop.
-					case -1:
-						k = max_games
-					}
-				}
-
-				// Send the score over the appropriate channel
-				//				fmt.Println("Preparing to send fitness ", index)
-				fitness_channels[index] <- score
-				//				fmt.Println("Sent fitness ", index)
-			}()
+			go elimination_fitness(g, playerMaker(pop[index]), max_games, &(fitness_channels[index]))
 		}
 
 		// Receive fitness values from channels and find the maximum fitness
@@ -131,6 +93,47 @@ func EvolveAgents(g games.Game, playerMaker games.PlayerMaker, generations int,
 		pop = new_pop
 	}
 
+}
+
+func elimination_fitness(g games.Game, player games.Player, max_games int, fitnessChan *chan int) {
+	// TODO Running the trials until a loss is unreliable because
+	// of the randomness in the game. Consider instead running a fixed
+	// number of trials and computing fitness as a percentage of those
+	// trials. Agents have an expected fitness of 50%, treat them accordingly.
+	// The only problem with running the maximum number of trials is that
+	// it slows the algorithm down substantially; stopping after the first
+	// loss quickly prunes the population. Perhaps I should instead
+	// run a small number of trials, say 10, and if it reaches the maximum
+	// continue running it until there is a loss? Then use the percentage
+	// as the fitness score.
+
+	score := 0
+	// Keep testing this player until the maximum number of games is
+	// reached.
+	for k := 0; k < max_games; k++ {
+		// Play the game against a random opponent
+		switch games.PlayerTrial(g, player) {
+		// If the agent player wins, reward it
+		case 1:
+			score += 1
+		// Reward draws too.
+		case 0:
+			score += 0 // After the code review, I changed the reward
+			// for draws to 0. In Tic Tac Toe this produces better
+			// results because a perfect player should win against
+			// a random player. This does make it nearly impossible
+			// to reach the maximum number of wins because some games
+			// will always be draws
+		// If they lose, break out of the loop.
+		case -1:
+			k = max_games
+		}
+	}
+
+	// Send the score over the appropriate channel
+	//				fmt.Println("Preparing to send fitness ", index)
+	*fitnessChan <- score
+	//				fmt.Println("Sent fitness ", index)
 }
 
 func weighted_selection(items []classifiers.Classifier, weights []int) classifiers.Classifier {
