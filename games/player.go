@@ -28,18 +28,19 @@ type Heuristic func(game_state interface{}) float64
 
 type Valid_moves func(game_state interface{}) []interface{}
 
-type Game_move func(game_state interface{}) interface{}
+type Game_move func(game_state interface{}, move interface{}) interface{}
 
-// Given a heuristic function, legal moves function, and
+// Given a heuristic function and game move function, returns a player that looks
+// at the next game state and picks the one with the highest value
 func DepthOneSearchPlayerMaker(h Heuristic, m Game_move) Player {
 	return func(game_state interface{}, moves []interface{}) interface{} {
 		n := rand.Intn(len(moves))
 		move := moves[n]
-		moveVal := 0
+		moveVal := 0.0
 
 		for i := 0; i < len(moves); i++ {
-			new_board := m(game_state, m)
-			boad_val := h(new_boad)
+			new_board := m(game_state, moves[i])
+			board_val := h(new_board)
 			if board_val > moveVal {
 				moveVal = board_val
 				move = moves[i]

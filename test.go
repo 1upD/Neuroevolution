@@ -12,7 +12,8 @@ func main() {
 	//testSaveJSON()
 	//testXOR()
 	//testTicTacToe()
-	testCheckers()
+	//testCheckers()
+	testDepthOneCheckers()
 }
 
 // Seed a population of networks capable of learning XOR and then run neuroevolution
@@ -137,6 +138,20 @@ func testCheckers() {
 func testRandomCheckers() {
 	for {
 		victor := games.Checkers(games.HumanCheckersPlayer, games.RandomPlayer)
+		if victor == 1 {
+			fmt.Println("\n\nYou win!")
+		} else if victor == 0 {
+			fmt.Println("\n\nDraw!")
+		} else if victor == -1 {
+			fmt.Println("\n\nYou lose!")
+		}
+	}
+}
+
+// Test the user interface of checkers against a random player
+func testDepthOneCheckers() {
+	for {
+		victor := games.Checkers(games.HumanCheckersPlayer, games.DepthOneSearchPlayerMaker(games.Checkers_heuristic, games.Checkers_make_move))
 		if victor == 1 {
 			fmt.Println("\n\nYou win!")
 		} else if victor == 0 {

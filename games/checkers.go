@@ -76,7 +76,7 @@ func MakeCheckers(turn_limit int) Game {
 		// Main game loop
 		for turn := 0; red_score < 12 && black_score < 12 && (turn_limit < 1 || turn < turn_limit); turn++ {
 			// Black player move
-			moves = calculate_checkers_moves(game_state)
+			moves = Calculate_checkers_moves(game_state)
 			for len(moves) > 0 {
 				//			fmt.Println("Black player's turn")
 				player_move = black_player(game_state, moves).([4]int)
@@ -87,7 +87,7 @@ func MakeCheckers(turn_limit int) Game {
 
 			// Flip the board in preparation for red player
 			game_state = checkers_board_flip(game_state)
-			moves = calculate_checkers_moves(game_state)
+			moves = Calculate_checkers_moves(game_state)
 
 			// Red player move
 			for len(moves) > 0 {
@@ -263,7 +263,8 @@ func checkers_make_move(game_state [8][8]int, move [4]int) ([8][8]int, int) {
 // This exported version of the function doesn't return captured pieces and is used
 // for depth one search players.
 // Returns a board state and the number of captures
-func Checkers_make_move(game_state interface{}) interface{} {
+func Checkers_make_move(state interface{}, player_move interface{}) interface{} {
+	move := player_move.([4]int)
 	game_state := state.([8][8]int)
 	//	fmt.Println("Move made: ", move)
 
@@ -474,4 +475,21 @@ func HumanCheckersPlayer(game_state interface{}, moves []interface{}) interface{
 
 		fmt.Println("\nInvalid move. Please try again.")
 	}
+}
+
+// Simple heurstic function that counts the number of pieces and returns them
+func Checkers_heuristic(game_state interface{}) float64 {
+	checkers_state := game_state.([8][8]int)
+	score := 0.0
+	for i := 0; i < 8; i++ {
+		for j := 0; j < 8; j++ {
+			if checkers_state[i][j] > 0 {
+				score += 1
+			} else if checkers_state[i][j] < 0 {
+				score -= 1
+			}
+		}
+	}
+
+	return score
 }
