@@ -1,0 +1,3 @@
+For this player, I tried modifying the player trial function to pit the player against a basic AI instead of a random player. The simple AI player is a depth one heuristic bot that looks at the outcome of each move and counts the number of pieces on the board. If all of the moves are equal, it returns a random move.
+
+I was surprised by just how much worse the learning algorithm peformed against the heuristic player versus a random player. This network's evolution was run against the heuristic player for 256 generations with a checkers game lasting 128 moves, and 256 games max per trial. The network only reached a maximum score of 58 and when the algorithm completed the max score was only 28.
