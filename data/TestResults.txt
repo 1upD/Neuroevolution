@@ -1,0 +1,76 @@
+Policy Network A defeated Policy Network A
+Policy Network A and Policy Network B tied!
+Policy Network A was defeated by Policy Network C
+Policy Network A defeated Value Network D
+Policy Network A defeated Value Network E
+Policy Network A defeated Random Player
+Policy Network A defeated Depth One Heuristic Player
+
+Policy Network A won 5 games
+***
+
+Policy Network B was defeated by Policy Network A
+Policy Network B defeated Policy Network B
+Policy Network B and Policy Network C tied!
+Policy Network B defeated Value Network D
+Policy Network B was defeated by Value Network E
+Policy Network B was defeated by Random Player
+Policy Network B was defeated by Depth One Heuristic Player
+
+Policy Network B won 2 games
+***
+
+Policy Network C defeated Policy Network A
+Policy Network C was defeated by Policy Network B
+Policy Network C defeated Policy Network C
+Policy Network C was defeated by Value Network D
+Policy Network C defeated Value Network E
+Policy Network C defeated Random Player
+Policy Network C was defeated by Depth One Heuristic Player
+
+Policy Network C won 4 games
+***
+
+Value Network D defeated Policy Network A
+Value Network D defeated Policy Network B
+Value Network D was defeated by Policy Network C
+Value Network D and Value Network D tied!
+Value Network D defeated Value Network E
+Value Network D defeated Random Player
+Value Network D defeated Depth One Heuristic Player
+
+Value Network D won 5 games
+***
+
+Value Network E was defeated by Policy Network A
+Value Network E defeated Policy Network B
+Value Network E defeated Policy Network C
+Value Network E defeated Value Network D
+Value Network E and Value Network E tied!
+Value Network E defeated Random Player
+Value Network E defeated Depth One Heuristic Player
+
+Value Network E won 5 games
+***
+
+Random Player was defeated by Policy Network A
+Random Player was defeated by Policy Network B
+Random Player was defeated by Policy Network C
+Random Player was defeated by Value Network D
+Random Player defeated Value Network E
+Random Player was defeated by Random Player
+Random Player was defeated by Depth One Heuristic Player
+
+Random Player won 1 games
+***
+
+Depth One Heuristic Player defeated Policy Network A
+Depth One Heuristic Player was defeated by Policy Network B
+Depth One Heuristic Player defeated Policy Network C
+Depth One Heuristic Player was defeated by Value Network D
+Depth One Heuristic Player was defeated by Value Network E
+Depth One Heuristic Player defeated Random Player
+Depth One Heuristic Player was defeated by Depth One Heuristic Player
+
+Depth One Heuristic Player won 3 games
+***
