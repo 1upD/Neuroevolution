@@ -67,11 +67,13 @@ func TicTacToe(x_player Player, o_player Player) int {
 }
 
 // Given a game state for tic tac toe, return a list of valid moves
-func calculate_moves(game_state [9]int) []interface{} {
+func calculate_moves(game_state interface{}) []interface{} {
+	tic_tac_toe_state := game_state.([9]int)
+
 	var moves []interface{}
 
 	for i := 0; i < 9; i++ {
-		if game_state[i] == 0 {
+		if tic_tac_toe_state[i] == 0 {
 			moves = append(moves, i)
 		}
 	}

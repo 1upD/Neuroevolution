@@ -115,15 +115,16 @@ func MakeCheckers(turn_limit int) Game {
 }
 
 // Calculates all possible normal moves for the black player on a checkers board
-func calculate_checkers_moves(game_state [8][8]int) []interface{} {
+func Calculate_checkers_moves(game_state interface{}) []interface{} {
+	checkers_state := game_state.([8][8]int)
 	moves := []interface{}{}
 	// TODO Use goroutines and channels to speed this up!
 
 	for i := 0; i < 8; i++ {
 		for j := 0; j < 8; j++ {
-			if game_state[i][j] > 0 {
-				moves = append(moves, calculate_checkers_moves_per_piece(game_state, [2]int{i, j}, game_state[i][j] == 2)...)
-				moves = append(moves, calculate_checkers_captures_per_piece(game_state, [2]int{i, j}, game_state[i][j] == 2)...)
+			if checkers_state[i][j] > 0 {
+				moves = append(moves, calculate_checkers_moves_per_piece(checkers_state, [2]int{i, j}, checkers_state[i][j] == 2)...)
+				moves = append(moves, calculate_checkers_captures_per_piece(checkers_state, [2]int{i, j}, checkers_state[i][j] == 2)...)
 			}
 		}
 	}
@@ -256,6 +257,52 @@ func checkers_make_move(game_state [8][8]int, move [4]int) ([8][8]int, int) {
 
 	// Return the game state
 	return game_state, captured
+}
+
+// Given a board state and a valid move, make the move
+// This exported version of the function doesn't return captured pieces and is used
+// for depth one search players.
+// Returns a board state and the number of captures
+func Checkers_make_move(game_state interface{}) interface{} {
+	game_state := state.([8][8]int)
+	//	fmt.Println("Move made: ", move)
+
+	isKing := false
+
+	// Pick up a piece
+	// Is it already a king?
+	if game_state[move[0]][move[1]] == 2 {
+		isKing = true
+	}
+
+	game_state[move[0]][move[1]] = 0
+
+	// Check if this move is a capture and remove opposing pieces
+	// If the difference in Y is 2, this move is a capture
+	//	fmt.Println("\nIs this a capture? ", (move[3]-move[1])*(move[3]-move[1]))
+	if (move[3]-move[1])*(move[3]-move[1]) == 4 {
+		captured_x := (move[0] + move[2]) / 2
+		captured_y := (move[1] + move[3]) / 2
+
+		game_state[captured_x][captured_y] = 0
+	}
+
+	// Should the piece be kinged?
+	if move[3] == 0 {
+		isKing = true
+	}
+
+	// Place the piece
+	if isKing {
+		game_state[move[2]][move[3]] = 2
+
+	} else {
+		game_state[move[2]][move[3]] = 1
+
+	}
+
+	// Return the game state
+	return game_state
 }
 
 // Given an agent that accepts 65 inputs and classifies 24 outputs, this function
