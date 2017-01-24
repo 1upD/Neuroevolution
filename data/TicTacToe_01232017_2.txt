@@ -1,0 +1,5 @@
+I reduced the population size to 128, and increased the number of generations and the number of trials to 256.
+
+The fitness values gradually improved but ultimately did not converge. To me, this demonstrates that calculating fitness as a percentage is not as effective as the way I was doing it before.
+
+My original fitness function seemed too simplistic to me because it is at the whim of random chance; a very good network could fail on the first trial while a very bad network could randomly perform much better. However, I think it helped me to prune the tree by rewarding networks that stuck out the longest while immediately culling any network that fell behind. The old fitness function lended more diversity to the gene pool by culling networks that had up to that point been performing well.
