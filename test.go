@@ -14,7 +14,7 @@ func main() {
 	//testTicTacToe()
 	//	testCheckers()
 	//testDepthOneCheckers()
-	testEvolvedNetworks()
+	testEvolveCheckersPolicyNetwork()
 }
 
 // Seed a population of networks capable of learning XOR and then run neuroevolution
@@ -97,33 +97,52 @@ func testTicTacToe() {
 
 }
 
+func testEvolveCheckersPolicyNetwork() {
+	testEvolveCheckers(games.CheckersPlayerMaker, "data/CheckersPolicyNetwork.json")
+}
+
+func testEvolveCheckersValueNetwork() {
+	testEvolveCheckers(games.ClassifierHeuristicPlayerMakerMaker(games.Checkers_make_move, games.CheckersTranslateInputs), "data/CheckersValueNetwork.json")
+}
+
 // Seed a population of networks capable of learning Checkers (input size 65,
 // output size 24) and run neuroevolution to produce an agent that has evolved to
 // play Checkers.
 //
 // Run Checkers games against the user indefinitely once the evolved agent is ready.
-func testCheckers() {
+func testEvolveCheckers(playerMaker games.PlayerMaker, filename string) {
 	// Seed the initial population
-	pop_size := 128
+	pop_size := 256
 	pop := make([]classifiers.Classifier, pop_size)
-	for i := 0; i < pop_size; i++ {
-		pop[i] = classifiers.RandomNetwork(65, 33, 1)
+
+	network_a, _ := classifiers.LoadJSON("data\\Checkers_01232017_1.json")
+
+	network_b, _ := classifiers.LoadJSON("data\\Checkers_01232017_2.json")
+
+	network_c, _ := classifiers.LoadJSON("data\\Checkers_01242017_1.json")
+
+	pop[0] = network_a
+	pop[1] = network_b
+	pop[2] = network_c
+
+	for i := 3; i < pop_size; i++ {
+		pop[i] = classifiers.RandomNetwork(65, 130, 24)
 	}
 
 	// Run neuroevolution to produce an agent. The checkers games used by the
 	// evolutionary algorithm will be cut off after 100 moves to prevent
 	// random players from prolonging the game indefinitely.
-	evolved_agent := evolution.EvolveAgents(games.MakeCheckers(32), games.ClassifierHeuristicPlayerMakerMaker(games.Checkers_make_move, games.CheckersTranslateInputs),
-		256, 256, 4, pop, evolution.Elimination_fitness) // Each member of the population will be tested at maximum 128 times.
+	evolved_agent := evolution.EvolveAgents(games.MakeCheckers(1024), playerMaker,
+		2048, 1024, 4, pop, evolution.Elimination_fitness) // Each member of the population will be tested at maximum 128 times.
 	// After 256 generations the algorithm concludes if it hasn't already spawned
 	// an agent that can win 128 times for 4 generations.
 	fmt.Println("Training complete!")
 
-	save(evolved_agent, "data/Checkers.json")
+	save(evolved_agent, filename)
 
 	// Play checkers against the user indefinitely
 	for {
-		victor := games.Checkers(games.ClassifierHeuristicPlayerMakerMaker(games.Checkers_make_move, games.CheckersTranslateInputs)(evolved_agent), games.HumanCheckersPlayer)
+		victor := games.Checkers(playerMaker(evolved_agent), games.HumanCheckersPlayer)
 		if victor == -1 {
 			fmt.Println("\n\nYou win!")
 		} else if victor == 0 {
