@@ -12,8 +12,9 @@ func main() {
 	//testSaveJSON()
 	//testXOR()
 	//testTicTacToe()
-	testCheckers()
+	//	testCheckers()
 	//testDepthOneCheckers()
+	testEvolvedNetworks()
 }
 
 // Seed a population of networks capable of learning XOR and then run neuroevolution
@@ -122,7 +123,7 @@ func testCheckers() {
 
 	// Play checkers against the user indefinitely
 	for {
-		victor := games.Checkers(games.CheckersPlayerMaker(evolved_agent), games.HumanCheckersPlayer)
+		victor := games.Checkers(games.ClassifierHeuristicPlayerMakerMaker(games.Checkers_make_move, games.CheckersTranslateInputs)(evolved_agent), games.HumanCheckersPlayer)
 		if victor == -1 {
 			fmt.Println("\n\nYou win!")
 		} else if victor == 0 {
@@ -168,4 +169,45 @@ func save(c classifiers.Classifier, filename string) {
 		fmt.Println("Error saving agent: ", err)
 	}
 	fmt.Println("Saved to file: ", filename)
+}
+
+func testEvolvedNetworks() {
+	// The first networks are all policy networks
+	network_a, _ := classifiers.LoadJSON("data\\Checkers_01232017_1.json")
+	player_a := games.CheckersPlayerMaker(network_a)
+
+	network_b, _ := classifiers.LoadJSON("data\\Checkers_01232017_2.json")
+	player_b := games.CheckersPlayerMaker(network_b)
+
+	network_c, _ := classifiers.LoadJSON("data\\Checkers_01242017_1.json")
+	player_c := games.CheckersPlayerMaker(network_c)
+
+	// These are value networks
+	network_d, _ := classifiers.LoadJSON("data\\Checkers_01242017_2.json")
+	player_d := games.ClassifierHeuristicPlayerMakerMaker(games.Checkers_make_move, games.CheckersTranslateInputs)(network_d)
+
+	network_e, _ := classifiers.LoadJSON("data\\Checkers_01242017_3.json")
+	player_e := games.ClassifierHeuristicPlayerMakerMaker(games.Checkers_make_move, games.CheckersTranslateInputs)(network_e)
+
+	players := []games.Player{player_a, player_b, player_c, player_d, player_e, games.RandomPlayer, games.DepthOneSearchPlayerMaker(games.Checkers_heuristic, games.Checkers_make_move)}
+	player_names := []string{"Policy Network A", "Policy Network B", "Policy Network C", "Value Network D", "Value Network E", "Random Player", "Depth One Heuristic Player"}
+
+	for i := 0; i < len(players); i++ {
+		score := 0
+		for j := 0; j < len(players); j++ {
+			victor := games.MakeCheckers(1024)(players[j], players[i])
+			if victor == -1 {
+				score += 1
+				fmt.Printf("%v defeated %v\n", player_names[i], player_names[j])
+			} else if victor == 1 {
+				fmt.Printf("%v was defeated by %v\n", player_names[i], player_names[j])
+			} else {
+				fmt.Printf("%v and %v tied!\n", player_names[i], player_names[j])
+			}
+
+		}
+
+		fmt.Printf("\n%v won %v games\n***\n\n", player_names[i], score)
+	}
+
 }
