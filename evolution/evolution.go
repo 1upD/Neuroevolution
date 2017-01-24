@@ -51,8 +51,9 @@ func EvolveAgents(g games.Game, playerMaker games.PlayerMaker, generations int,
 				// run a small number of trials, say 10, and if it reaches the maximum
 				// continue running it until there is a loss? Then use the percentage
 				// as the fitness score.
-
 				score := 0.0
+				wins := 0
+				draws := 0
 				player := playerMaker(pop[index])
 				// Keep testing this player until the maximum number of games is
 				// reached.
@@ -61,10 +62,10 @@ func EvolveAgents(g games.Game, playerMaker games.PlayerMaker, generations int,
 					switch games.PlayerTrial(g, player) {
 					// If the agent player wins, reward it
 					case 1:
-						score += 1.0
+						wins += 1.0
 					// Reward draws too.
 					case 0:
-						score += 0.0 // After the code review, I changed the reward
+						draws += 1.0 // After the code review, I changed the reward
 						// for draws to 0. In Tic Tac Toe this produces better
 						// results because a perfect player should win against
 						// a random player. This does make it nearly impossible
@@ -81,7 +82,16 @@ func EvolveAgents(g games.Game, playerMaker games.PlayerMaker, generations int,
 
 				// Send the score over the appropriate channel
 				//				fmt.Println("Preparing to send fitness ", index)
-				fitness_channels[index] <- (score / float64(max_games)) * 100.0 // Score fitness as a percentage - 100 is max, 50 is expected, 0 is min
+				if wins+draws == max_games {
+					score = 50
+				} else {
+					score = ((float64(wins) / float64(max_games)) * 100.0) - 50 // a totally random player should expect to win 50% of the time - treat this as 0
+					if score < 0 {
+						score = 0
+					}
+				}
+
+				fitness_channels[index] <- score // Score fitness as a percentage - 100 is max, 50 is expected, 0 is min
 				//				fmt.Println("Sent fitness ", index)
 			}()
 		}

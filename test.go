@@ -11,8 +11,8 @@ import (
 func main() {
 	//testSaveJSON()
 	//testXOR()
-	testTicTacToe()
-	//testCheckers()
+	//testTicTacToe()
+	testCheckers()
 }
 
 // Seed a population of networks capable of learning XOR and then run neuroevolution
@@ -75,7 +75,7 @@ func testTicTacToe() {
 
 	// Evolve an agent capable of playing
 	evolved_agent := evolution.EvolveAgents(games.TicTacToe, games.TicTacToePlayerMaker,
-		100, 128, 10, pop)
+		512, 256, 4, pop)
 
 	fmt.Println("Training complete!")
 
