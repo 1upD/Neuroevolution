@@ -50,3 +50,17 @@ func DepthOneSearchPlayerMaker(h Heuristic, m Game_move) Player {
 		return move
 	}
 }
+
+type ClassifierTranslate func(game_state interface{}) []float64
+
+// A factory function for a factory function is a litle ugly, but bear with me.
+// This generates Heuristic Player Maker for a given game as defined by the game
+// move function as the classifier translation function.
+func ClassifierHeuristicPlayerMakerMaker(m Game_move, t ClassifierTranslate) PlayerMaker {
+	return func(a classifiers.Classifier) Player {
+		return DepthOneSearchPlayerMaker(func(game_state interface{}) float64 {
+			classifications := a.Classify(t(game_state))
+			return classifications[0] // This network only has one output
+		}, m)
+	}
+}

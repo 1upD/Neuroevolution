@@ -330,53 +330,7 @@ func Checkers_make_move(state interface{}, player_move interface{}) interface{} 
 // predictions on that moves coordinates, and choosing the maximum summed prediction.
 func CheckersPlayerMaker(a classifiers.Classifier) Player {
 	return func(game_state interface{}, moves []interface{}) interface{} {
-		// Activation input - always on
-		inputs := []float64{1.0}
-
-		// The first 32 inputs represent which side the space belongs to
-		for i := 0; i < 8; i++ {
-			j := 0
-
-			if i%2 == 0 {
-				j = 1
-			}
-
-			for j < 8 {
-				val := game_state.([8][8]int)[i][j]
-				if val < 0 {
-					inputs = append(inputs, -1.0)
-				} else if val > 0 {
-					inputs = append(inputs, 1.0)
-				} else {
-					inputs = append(inputs, 0.0)
-				}
-
-				j += 2
-			}
-
-		}
-
-		// The last 32 inputs represent whether or not the piece on a space is a king
-		for i := 0; i < 8; i++ {
-			j := 0
-
-			if i%2 == 0 {
-				j = 1
-			}
-
-			for j < 8 {
-				val := game_state.([8][8]int)[i][j]
-				if val*val == 4 {
-					inputs = append(inputs, 1.0)
-				} else {
-					inputs = append(inputs, 0.0)
-				}
-
-				j += 2
-			}
-
-		}
-
+		inputs := CheckersTranslateInputs(game_state)
 		prediction := a.Classify(inputs)
 
 		max_choice := moves[0]
@@ -412,6 +366,57 @@ func CheckersPlayerMaker(a classifiers.Classifier) Player {
 		return max_choice
 
 	}
+}
+
+func CheckersTranslateInputs(game_state interface{}) []float64 {
+	// Activation input - always on
+	inputs := []float64{1.0}
+
+	// The first 32 inputs represent which side the space belongs to
+	for i := 0; i < 8; i++ {
+		j := 0
+
+		if i%2 == 0 {
+			j = 1
+		}
+
+		for j < 8 {
+			val := game_state.([8][8]int)[i][j]
+			if val < 0 {
+				inputs = append(inputs, -1.0)
+			} else if val > 0 {
+				inputs = append(inputs, 1.0)
+			} else {
+				inputs = append(inputs, 0.0)
+			}
+
+			j += 2
+		}
+
+	}
+
+	// The last 32 inputs represent whether or not the piece on a space is a king
+	for i := 0; i < 8; i++ {
+		j := 0
+
+		if i%2 == 0 {
+			j = 1
+		}
+
+		for j < 8 {
+			val := game_state.([8][8]int)[i][j]
+			if val*val == 4 {
+				inputs = append(inputs, 1.0)
+			} else {
+				inputs = append(inputs, 0.0)
+			}
+
+			j += 2
+		}
+
+	}
+
+	return inputs
 }
 
 // This function prints a game state to the console and prompts the user to select a move.

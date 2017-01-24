@@ -57,7 +57,7 @@ func EvolveAgents(g games.Game, playerMaker games.PlayerMaker, generations int,
 			}
 		}
 
-		if fitness_values[0] == 100.0 { // This used to check the maximum value
+		if fitness_values[0] == 100 { // This used to check the maximum value
 			// but I changed it to instead look at the inherited value. A better measure
 			// of convergence of the population is whether the inherited network reached
 			// the maximum number of wins because the games are random
@@ -178,9 +178,9 @@ func Percentage_fitness(g games.Game, player games.Player, max_games int, fitnes
 	// Send the score over the appropriate channel
 	//				fmt.Println("Preparing to send fitness ", index)
 	if wins+draws == max_games {
-		score = 50
+		score = 100
 	} else {
-		score = ((float64(wins) / float64(max_games)) * 100.0) - 50 // a totally random player should expect to win 50% of the time - treat this as 0
+		score = ((float64(wins) / float64(max_games)) * 100.0)
 		if score < 0 {
 			score = 0
 		}

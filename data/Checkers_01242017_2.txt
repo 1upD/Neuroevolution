@@ -1,0 +1,5 @@
+This was my first attempt at using value networks rather than policy networks. Unfortunately, evolving value networks takes much longer than policy networks. I had expected them to evolve faster but what I hadn't anticipated was that even a depth one heuristic player needs to call the heuristic function several times before it chooses a move, which multiplies the number of times the network needs to fire to make a single move. Even though the number of output neurons is much smaller, it still takes significantly longer.
+
+I ran the evolutionary algorithm with a maximum 64 games per trial, population size of 256, for 100 generations. The game lasts 32 turns. The network did reach the maximum value but it does not look like it converged on a guaranteed win against a random player. This is somewhat disheartening.
+
+For the next trial, I think I will try decreasing the size of the hidden layer to see if I can cover more generations.
