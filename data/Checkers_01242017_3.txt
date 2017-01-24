@@ -1,0 +1,1 @@
+I ran the same algorithm with a hidden layer size of 33 instead of 130, 256 generations with a max score of 256 on a Checkers game for 32 moves. The networks failed to converge on a solution. The fitness of the evolved agent was measured as 191, which is below the max of 256.
