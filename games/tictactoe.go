@@ -6,6 +6,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/CRRDerek/Neuroevolution/classifiers"
 )
 
 //   1 | 2 | 3
@@ -148,7 +150,7 @@ func checkScore(score [8][2]int) int {
 
 }
 
-func TicTacToePlayerMaker(a Agent) Player {
+func TicTacToePlayerMaker(a classifiers.Classifier) Player {
 	return func(game_state interface{}, moves []interface{}) interface{} {
 
 		inputs := []float64{1.0}
@@ -175,7 +177,7 @@ func TicTacToePlayerMaker(a Agent) Player {
 
 		}
 
-		predictions := a.Predict(inputs)
+		predictions := a.Classify(inputs)
 
 		max_choice := -1
 		max_val := -999.0
