@@ -33,7 +33,6 @@ func TicTacToe(x_player Player, o_player Player) int {
 
 		player_move = x_player(invert_game_state(game_state), moves).(int)
 		// For now let's assume all players always return valid moves.
-		// TODO Check that this move is a valid move
 
 		game_state = move(game_state, player_move, -1)
 		score = score_move(score, player_move, 0)
@@ -52,7 +51,6 @@ func TicTacToe(x_player Player, o_player Player) int {
 
 		player_move = o_player(game_state, moves).(int)
 		// For now let's assume all players always return valid moves.
-		// TODO Check that this move is a valid move
 
 		game_state = move(game_state, player_move, 1)
 		score = score_move(score, player_move, 1)
@@ -99,6 +97,12 @@ func move(game_state [9]int, player_move int, player_number int) [9]int {
 	return game_state
 }
 
+// Given a scoring matrix as an eight by two matrix of integers, a player move,
+// and a player number, it increases the score in the scoring matrix.
+// Based on a Stack Overflow answer
+// http://stackoverflow.com/a/1610176
+// The scoring matrix has three pairs for rows, three pairs for columns, and two
+// pairs for diagonals.
 func score_move(score [8][2]int, player_move int, player_index int) [8][2]int {
 	switch player_move {
 	case 0:
@@ -138,6 +142,12 @@ func score_move(score [8][2]int, player_move int, player_index int) [8][2]int {
 	return score
 }
 
+// Given a scoring matrix, return the number of the winning player or 0 if no
+// one has won.
+// Based on a Stack Overflow answer
+// http://stackoverflow.com/a/1610176
+// The scoring matrix has three pairs for rows, three pairs for columns, and two
+// pairs for diagonals.
 func checkScore(score [8][2]int) int {
 	for i := 0; i < 8; i++ {
 		if score[i][0] == 3 && score[i][1] == 0 {
@@ -152,6 +162,8 @@ func checkScore(score [8][2]int) int {
 
 }
 
+// Makes a Plaayer function given a classifier with the correct number of inputs
+// and outputs for Tic Tac Toe.
 func TicTacToePlayerMaker(a classifiers.Classifier) Player {
 	return func(game_state interface{}, moves []interface{}) interface{} {
 
@@ -197,6 +209,7 @@ func TicTacToePlayerMaker(a classifiers.Classifier) Player {
 	}
 }
 
+// User interface for Tic Tac Toe
 func HumanTicTacToePlayer(game_state interface{}, moves []interface{}) interface{} {
 	state := game_state.([9]int)
 	fmt.Printf("\n%v | %v | %v", state[0], state[1], state[2])

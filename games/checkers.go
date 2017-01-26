@@ -118,7 +118,6 @@ func MakeCheckers(turn_limit int) Game {
 func Calculate_checkers_moves(game_state interface{}) []interface{} {
 	checkers_state := game_state.([8][8]int)
 	moves := []interface{}{}
-	// TODO Use goroutines and channels to speed this up!
 
 	for i := 0; i < 8; i++ {
 		for j := 0; j < 8; j++ {
@@ -280,7 +279,6 @@ func Checkers_make_move(state interface{}, player_move interface{}) interface{} 
 
 	// Check if this move is a capture and remove opposing pieces
 	// If the difference in Y is 2, this move is a capture
-	//	fmt.Println("\nIs this a capture? ", (move[3]-move[1])*(move[3]-move[1]))
 	if (move[3]-move[1])*(move[3]-move[1]) == 4 {
 		captured_x := (move[0] + move[2]) / 2
 		captured_y := (move[1] + move[3]) / 2
@@ -368,6 +366,7 @@ func CheckersPlayerMaker(a classifiers.Classifier) Player {
 	}
 }
 
+// Translates a Checkers board position into inputs for a classifier
 func CheckersTranslateInputs(game_state interface{}) []float64 {
 	// Activation input - always on
 	inputs := []float64{1.0}

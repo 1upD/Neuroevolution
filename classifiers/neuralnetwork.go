@@ -10,16 +10,22 @@ import (
 // This neural network is intended to be evolved, so it does not have a learning
 // rate or threshold as would be expected from a typical backpropogated neural
 // network.
+//
+// This code is based on a spare time Python project I worked on last fall.
 type neuralNetwork struct {
+	// Number of neurons in each layer
 	Num_inputs  int
 	Num_hiddens int
 	Num_outputs int
 
+	// Channels to concurrently pass activation values through
 	activations_hidden []chan float64
 	activations_output []chan float64
 
+	// Slice to store activation values in
 	hidden_outputs []float64
 
+	// Neuron layers
 	Layer_hidden []*neuron
 	Layer_output []*neuron
 }
@@ -30,12 +36,10 @@ type neuralNetwork struct {
 // The output array will match the output size of the network.
 func (net neuralNetwork) Classify(inputs []float64) []float64 {
 	// Launch a goroutine for each hidden neuron to calculate the output.
-	for i := 0; i < net.Num_hiddens; i++ { // TODO Why is this minus one!?
+	for i := 0; i < net.Num_hiddens; i++ {
 		index := i
 		go func() {
-			//			fmt.Println("Preparing to send hidden neuron ", index)
 			net.activations_hidden[index] <- net.Layer_hidden[index].Activate(inputs)
-			//			fmt.Println("Preparing to send hidden neuron ", index)
 		}()
 	}
 
@@ -46,13 +50,11 @@ func (net neuralNetwork) Classify(inputs []float64) []float64 {
 
 	// Receive values from earlier goroutines.
 	for j := 0; j < net.Num_hiddens; j++ {
-		//		fmt.Println("Preparing to receive hidden neuron ", j)
 		net.hidden_outputs[j] = <-net.activations_hidden[j]
-		//		fmt.Println("Received hidden neuron ", j)
 	}
 
 	// Launch a goroutine for each output neuron to calculate the final output.
-	for i := 0; i < net.Num_outputs; i++ { // TODO Why is this minus one!?
+	for i := 0; i < net.Num_outputs; i++ {
 		index := i
 		go func() {
 			net.activations_output[index] <- net.Layer_output[index].Activate(net.hidden_outputs)
@@ -60,7 +62,7 @@ func (net neuralNetwork) Classify(inputs []float64) []float64 {
 	}
 
 	// Receive values from output goroutines.
-	for j := 0; j < net.Num_outputs; j++ { // TODO Why is this minus one!?
+	for j := 0; j < net.Num_outputs; j++ {
 		final_outputs[j] = <-net.activations_output[j]
 	}
 

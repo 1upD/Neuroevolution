@@ -5,8 +5,9 @@ import (
 	"math/rand"
 )
 
+// Struct to model a single neuron within a neural network.
 type neuron struct {
-	// Number of inputs into this particle neuron.
+	// Number of inputs into this particular neuron.
 	// In a neural network, a neuron in the hidden layer has the same number of
 	// inputs as the number of inputs to the network, whlie a neuron in the
 	// output layer has the same number of inputs as the number of hidden neurons

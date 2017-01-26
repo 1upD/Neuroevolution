@@ -24,10 +24,9 @@ func RandomPlayer(game_state interface{}, moves []interface{}) interface{} {
 	return moves[n]
 }
 
+// Function types for Search based players
 type Heuristic func(game_state interface{}) float64
-
 type Valid_moves func(game_state interface{}) []interface{}
-
 type Game_move func(game_state interface{}, move interface{}) interface{}
 
 // Given a heuristic function and game move function, returns a player that looks
@@ -51,11 +50,14 @@ func DepthOneSearchPlayerMaker(h Heuristic, m Game_move) Player {
 	}
 }
 
+// Function type for functions that translate game states into classifier inputs
 type ClassifierTranslate func(game_state interface{}) []float64
 
 // A factory function for a factory function is a litle ugly, but bear with me.
 // This generates Heuristic Player Maker for a given game as defined by the game
 // move function as the classifier translation function.
+//
+// Used to train Value networks
 func ClassifierHeuristicPlayerMakerMaker(m Game_move, t ClassifierTranslate) PlayerMaker {
 	return func(a classifiers.Classifier) Player {
 		return DepthOneSearchPlayerMaker(func(game_state interface{}) float64 {

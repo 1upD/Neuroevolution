@@ -46,7 +46,6 @@ func XorGame(p1 Player, p2 Player) int {
 	}
 
 	p1move := p1([]float64{a, b}, []interface{}{0, 1})
-	//	p2move := p2([]float64{a, b}, []interface{}{0, 1})
 
 	if p1move == c {
 		return 1
