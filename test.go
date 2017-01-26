@@ -9,12 +9,30 @@ import (
 )
 
 func main() {
+	DemoTicTacToe()
 	//testSaveJSON()
 	//testXOR()
-	//testTicTacToe()
+	//	testTicTacToe()
 	//	testCheckers()
 	//testDepthOneCheckers()
-	testEvolveCheckersPolicyNetwork()
+	//testEvolveCheckersPolicyNetwork()
+}
+
+func DemoTicTacToe() {
+	network, _ := classifiers.LoadJSON("data\\Final_TicTacToe.json")
+	ai_player := games.TicTacToePlayerMaker(network)
+
+	for {
+		victor := games.TicTacToe(ai_player, games.HumanTicTacToePlayer)
+		if victor == -1 {
+			fmt.Println("\n\nYou win!")
+		} else if victor == 0 {
+			fmt.Println("\n\nDraw!")
+		} else if victor == 1 {
+			fmt.Println("\n\nYou lose!")
+		}
+	}
+
 }
 
 // Seed a population of networks capable of learning XOR and then run neuroevolution
@@ -77,7 +95,7 @@ func testTicTacToe() {
 
 	// Evolve an agent capable of playing
 	evolved_agent := evolution.EvolveAgents(games.TicTacToe, games.TicTacToePlayerMaker,
-		512, 256, 4, pop, evolution.Elimination_fitness)
+		64, 1024, 8, pop, evolution.Elimination_fitness)
 
 	fmt.Println("Training complete!")
 
