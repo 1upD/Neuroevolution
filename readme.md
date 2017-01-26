@@ -7,19 +7,26 @@ For my CS344 Artificial Intelligence course final project, I wrote a neuroevolut
 ## Usage ##
 
 Usage of C:\GoWorkspace\src\github.com\CRRDerek\Neuroevolution\Neuroevolution.exe:
-  -filename string
+
+	-filename string
         JSON file to load containing a neural network (default "None")
-  -game string
+ 
+	-game string
         Name of game to be played. Currently Tic Tac Toe and Checkers are supported. (default "Tic Tac Toe")
-  -generations int
+
+	-generations int
         Number of generations to evolve before returning the best network (default 128)
-  -maxgames int
+  
+	-maxgames int
         Maximum number of games to play within a population (default 1024)
-  -output string
+	
+	-output string
         Name of a JSON file to write the results to (default "data\\results.json")
-  -population int
+	
+	-population int
         Number of individuals in the population (default 256)
-  -streak int
+	
+	-streak int
         Number of generations that achieve the maximum score before ending the algorithm early (default 4)
 
 		
