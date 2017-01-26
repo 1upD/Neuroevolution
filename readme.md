@@ -6,7 +6,7 @@ For my CS344 Artificial Intelligence course final project, I wrote a neuroevolut
 
 ## Usage ##
 
-Usage of C:\GoWorkspace\src\github.com\CRRDerek\Neuroevolution\Neuroevolution.exe:
+Usage of Neuroevolution.exe:
 
 	-filename string
         JSON file to load containing a neural network (default "None")
@@ -16,7 +16,10 @@ Usage of C:\GoWorkspace\src\github.com\CRRDerek\Neuroevolution\Neuroevolution.ex
 
 	-generations int
         Number of generations to evolve before returning the best network (default 128)
-  
+ 
+	-hiddens int
+        Number of hidden neurons. Recommend 56 for Tic Tac Toe. (default 256)
+ 
 	-maxgames int
         Maximum number of games to play within a population (default 1024)
 	

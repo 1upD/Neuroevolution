@@ -19,6 +19,7 @@ func main() {
 	max_streak := flag.Int("streak", 4, "Number of generations that achieve the maximum score before ending the algorithm early")
 	output := flag.String("output", "data\\results.json", "Name of a JSON file to write the results to")
 	population := flag.Int("population", 256, "Number of individuals in the population")
+	hiddenNeurons := flag.Int("hiddens", 256, "Number of hidden neurons. Recommend 56 for Tic Tac Toe.")
 	flag.Parse()
 
 	// Declare variables
@@ -26,9 +27,10 @@ func main() {
 	var playerMaker games.PlayerMaker
 	var humanPlayer games.Player
 	var inputs int
-	var hiddens int
 	var outputs int
 	var network classifiers.Classifier
+
+	hiddens := *hiddenNeurons
 
 	// Configure the correct game functions and network size based on which game the user selected
 	if strings.ToLower(*game_name) == "tic tac toe" {
@@ -37,7 +39,6 @@ func main() {
 		humanPlayer = games.HumanTicTacToePlayer
 		// Configure a network size for a Tic Tac Toe policy network
 		inputs = 28
-		hiddens = 56
 		outputs = 9
 	} else if strings.ToLower(*game_name) == "checkers" {
 		// Impose a 1024 turn limit so the games don't get stuck in a loop
@@ -46,7 +47,6 @@ func main() {
 		humanPlayer = games.HumanCheckersPlayer
 		// Configure a network size for a Checkers policy network
 		inputs = 65
-		hiddens = 256
 		outputs = 24
 	} else {
 		fmt.Println("Please choose Tic Tac Toe or Checkers.")
