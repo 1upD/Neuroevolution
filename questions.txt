@@ -4,7 +4,9 @@ I ran several trials and stored the results in text files in the data folder. Wh
 
 2. Used in isolation from each other, do policy networks or value networks produce better players?
 
+Based on my trials, it is difficult to say. Value networks take much longer to train but they seem to perform equally well as policy networks.
 
 
 3. Can an evolved value network beat a heuristic function in search based players?
 
+Yes, although it is very difficult when the fitness function teaches a player to play against random players.
