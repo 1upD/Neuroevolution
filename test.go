@@ -1,7 +1,9 @@
 package main
 
 import (
+	"flag"
 	"fmt"
+	"strings"
 
 	"github.com/CRRDerek/Neuroevolution/classifiers"
 	"github.com/CRRDerek/Neuroevolution/evolution"
@@ -9,13 +11,83 @@ import (
 )
 
 func main() {
-	DemoTicTacToe()
-	//testSaveJSON()
-	//testXOR()
-	//	testTicTacToe()
-	//	testCheckers()
-	//testDepthOneCheckers()
-	//testEvolveCheckersPolicyNetwork()
+	// Parse flags
+	game_name := flag.String("game", "Tic Tac Toe", "Name of game to be played. Currently Tic Tac Toe and Checkers are supported.")
+	filename := flag.String("filename", "None", "JSON file to load containing a neural network")
+	generations := flag.Int("generations", 128, "Number of generations to evolve before returning the best network")
+	max_games := flag.Int("maxgames", 1024, "Maximum number of games to play within a population")
+	max_streak := flag.Int("streak", 4, "Number of generations that achieve the maximum score before ending the algorithm early")
+	output := flag.String("output", "data\\results.json", "Name of a JSON file to write the results to")
+	population := flag.Int("population", 256, "Number of individuals in the population")
+	flag.Parse()
+
+	// Declare variables
+	var game games.Game
+	var playerMaker games.PlayerMaker
+	var humanPlayer games.Player
+	var inputs int
+	var hiddens int
+	var outputs int
+	var network classifiers.Classifier
+
+	// Configure the correct game functions and network size based on which game the user selected
+	if strings.ToLower(*game_name) == "tic tac toe" {
+		game = games.TicTacToe
+		playerMaker = games.TicTacToePlayerMaker
+		humanPlayer = games.HumanTicTacToePlayer
+		// Configure a network size for a Tic Tac Toe policy network
+		inputs = 28
+		hiddens = 56
+		outputs = 9
+	} else if strings.ToLower(*game_name) == "checkers" {
+		// Impose a 1024 turn limit so the games don't get stuck in a loop
+		game = games.MakeCheckers(1024)
+		playerMaker = games.CheckersPlayerMaker
+		humanPlayer = games.HumanCheckersPlayer
+		// Configure a network size for a Checkers policy network
+		inputs = 65
+		hiddens = 256
+		outputs = 24
+	} else {
+		fmt.Println("Please choose Tic Tac Toe or Checkers.")
+		return
+	}
+
+	// If there is a file specificed, load the file instead of evolving
+	if *filename != "None" {
+		var err error
+		network, err = classifiers.LoadJSON(*filename)
+		if err != nil {
+			fmt.Println("Error loading classifier: ", err)
+			return
+		}
+	} else {
+		// Seed the initial population
+		pop := make([]classifiers.Classifier, *population)
+		for i := 0; i < *population; i++ {
+			pop[i] = classifiers.RandomNetwork(inputs, hiddens, outputs)
+		}
+
+		network = evolution.EvolveAgents(game, playerMaker, *generations, *max_games, *max_streak, pop, evolution.Elimination_fitness)
+
+		// Save the results to a file
+		save(network, *output)
+	}
+
+	// Make a player out of the network
+	player := playerMaker(network)
+
+	// Play the game indefinitely
+	for {
+		victor := game(player, humanPlayer)
+		if victor == -1 {
+			fmt.Println("\n\nYou win!")
+		} else if victor == 0 {
+			fmt.Println("\n\nDraw!")
+		} else if victor == 1 {
+			fmt.Println("\n\nYou lose!")
+		}
+	}
 }
 
 func DemoTicTacToe() {
@@ -141,7 +213,7 @@ func testEvolveCheckers(playerMaker games.PlayerMaker, filename string) {
 	// evolutionary algorithm will be cut off after 100 moves to prevent
 	// random players from prolonging the game indefinitely.
 	evolved_agent := evolution.EvolveAgents(games.MakeCheckers(1024), playerMaker,
-		128, 1024, 4, pop, evolution.Elimination_fitness) // Each member of the population will be tested at maximum 128 times.
+		1024, 1024, 4, pop, evolution.Elimination_fitness) // Each member of the population will be tested at maximum 128 times.
 	// After 256 generations the algorithm concludes if it hasn't already spawned
 	// an agent that can win 128 times for 4 generations.
 	fmt.Println("Training complete!")
